@@ -1,0 +1,23 @@
+{
+  "name": "astroroastscripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-roasts": "tsx roasts/generate_daily_roasts.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mistralai/mistralai": "^2.2.1",
+    "@supabase/supabase-js": "^2.105.4",
+    "dotenv": "^17.4.2",
+    "swisseph": "^0.5.17",
+    "tsx": "^4.21.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3"
+  }
+}
