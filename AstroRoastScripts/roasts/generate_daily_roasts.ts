@@ -3,10 +3,19 @@ import { Mistral } from "@mistralai/mistralai";
 import "dotenv/config";
 import { ZODIAC_SIGNS } from "../constants";
 
-const { EXPO_PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY, MISTRAL_API_KEY } =
-  process.env;
+const {
+  EXPO_PUBLIC_SUPABASE_URL,
+  SERVICE_ROLE_KEY,
+  MISTRAL_API_KEY,
+  MISTRAL_CONTENT_PROMPT_SYSTEM,
+} = process.env;
 
-if (!EXPO_PUBLIC_SUPABASE_URL || !SERVICE_ROLE_KEY || !MISTRAL_API_KEY) {
+if (
+  !EXPO_PUBLIC_SUPABASE_URL ||
+  !SERVICE_ROLE_KEY ||
+  !MISTRAL_API_KEY ||
+  !MISTRAL_CONTENT_PROMPT_SYSTEM
+) {
   throw new Error("Missing required environment variables");
 }
 
@@ -43,7 +52,7 @@ function normalizeRoastData(parsed: any, sign: string) {
   if (!hook || !content || !advice) return null;
 
   // enforce max lengths
-  const MAX_CONTENT = 250;
+  const MAX_CONTENT = 400;
   const cleanContent =
     typeof content === "string"
       ? content.trim().slice(0, MAX_CONTENT)
@@ -67,7 +76,10 @@ function generateFallbackRoast(sign: string, eventDescription: string) {
 }
 
 async function generateWeeklyRoasts() {
-  const startDate = new Date().toISOString().split("T")[0]; // default is today
+  // default is tomorrow date, but we can specify a date for testing purposes
+  const startDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
 
   // 1. Get the cosmic event for a week from Supabase
   const { data: events, error } = await supabase
@@ -110,11 +122,12 @@ async function generateWeeklyRoasts() {
                 {
                   role: "system",
                   content:
-                    "You are AstroRoast, the satirical AI of the 'Cosmic Tabloid application'. Your tone is cynical, but sophisticated and never mean or cruel. You say nothing racist, sexist, or anything that could offend people's political, religious, or sexual beliefs. You make no assumptions about your reader's gender or sexual orientation (use neutral terms if necessary). You can embellish your response with cultural or pop culture references if needed. You take into account the stereotypes about the signs and common misconceptions about the current cosmic event to create a witty and entertaining roast.",
+                    MISTRAL_CONTENT_PROMPT_SYSTEM ||
+                    "The prompt is missing, do not generate a roast without it.",
                 },
                 {
                   role: "user",
-                  content: `Today's cosmic event is: ${event.description}. The sign is ${sign}. Generate a roast for this sign based on the cosmic event. The roast should be witty, aggressive but never mean or cruel, and should not exceed 400 characters. Also provide a passive-aggressive cosmic advice in 10 words max. Output format (JSON only, strictly this format): { "astro_sign": "${sign}", "roast_hook": "<hook>", "main_roast": "<main>", "cosmic_advice": "<advice>" }`,
+                  content: `Today's cosmic event is: ${event.description}. The sign is ${sign}. Generate a roast of 400 characters for this sign based on the cosmic event and the zodiac sign's traits. The roast should be witty, aggressive but never mean or cruel, and should not exceed 400 characters. Also provide a passive-aggressive cosmic advice in 10 words max and a hook for the roast. Output format (JSON only, strictly this format): { "astro_sign": "${sign}", "roast_hook": "<hook>", "main_roast": "<main>", "cosmic_advice": "<advice>" }`,
                 },
               ],
               responseFormat: { type: "json_object" },
