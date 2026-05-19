@@ -21,7 +21,7 @@ export const fetchDailyRoast = async (): Promise<DailyRoast> => {
     .eq("sign", profile.astro_sign)
     .eq("date", today);
 
-  if (error || !data)
+    if (error || !data || data.length === 0)
     throw new Error("Oups, an error occured. The cosmos is silent today...");
   return data[0] as DailyRoast;
 };

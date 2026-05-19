@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { captureRef } from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
+import { File, Paths } from "expo-file-system";
 import {
   StyleSheet,
   Text,
@@ -8,12 +11,15 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+
 import { LinearGradient } from "expo-linear-gradient";
 import { fetchDailyRoast, fetchCosmicEvent } from "../actions";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { BurnScreenProps } from "../types/navigation";
+import ShareCard from "../components/ShareCard";
 
 export const BurnScreen: React.FC<BurnScreenProps> = () => {
+  const cardRef = useRef(null);
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["dailyRoast"],
     queryFn: () => fetchDailyRoast(),
@@ -30,6 +36,14 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
     queryFn: () => fetchCosmicEvent(),
     retry: 1,
   });
+
+  const todayDate = new Date();
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
 
   if (isLoading) {
     return (
@@ -55,90 +69,140 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
 
   const signColor = data?.sign ? SIGN_COLORS[data.sign] : COLORS.primary;
 
+  const handleShare = async () => {
+    try {
+      // 1. Capture the card as an image (generate temporary URI)
+      const tempUri = await captureRef(cardRef, {
+        format: "png",
+        quality: 1,
+      });
+
+      // 2. Create a File instance pointing to the temporary location
+      const sourceFile = new File(tempUri);
+
+      // 3. Create a destination File in the documents directory
+      const fileName = `astro_daily_roast_${Date.now()}.png`;
+      const destinationFile = new File(Paths.document, fileName);
+
+      // 4. Copy the file from temp to permanent location
+      sourceFile.copy(destinationFile);
+
+      // 5. Check if sharing is available
+      if (!(await Sharing.isAvailableAsync())) {
+        alert("Le partage n'est pas disponible sur votre appareil");
+        return;
+      }
+
+      // 6. Share the image using the system's share dialog
+      await Sharing.shareAsync(destinationFile.uri, {
+        mimeType: "image/png",
+        dialogTitle: "Share your Daily Roast",
+        UTI: "public.png", // for iOS
+      });
+    } catch (error) {
+      console.error("Error sharing the card:", error);
+      alert("Oups, something wrong happened :( Try again later.");
+    }
+  };
+
   return (
-    <View style={styles.void}>
-      <LinearGradient
-        colors={[signColor + "90", "rgba(0,0,0,0)"]}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "100%",
-        }}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-      />
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        bounces={true}
-      >
-        <View style={styles.title}>
-          <Text style={styles.displayMd}>ASTRO ROAST</Text>
-        </View>
-
-        <View style={styles.header}>
-          <Text style={[styles.displayLg, { color: signColor }]}>
-            {data?.sign?.toUpperCase()}
-          </Text>
-          <Text style={styles.displayMd}>Daily Burn</Text>
-        </View>
-
-        <View style={styles.dataGrid}>
-          <Text style={styles.date}>
-            {new Date().toLocaleDateString("fr-FR")}
-          </Text>
-          <View style={styles.dataBlock}>
-            {isCosmicEventLoading ||
-              (isCosmicEventError && (
-                <Text style={styles.dataValue}>No cosmic event today</Text>
-              ))}
-            <Text style={styles.dataValue}>
-              {cosmicEventData?.evenement?.toUpperCase()}
+    <>
+      <View style={styles.void}>
+        <LinearGradient
+          colors={[signColor + "90", "rgba(0,0,0,0)"]}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "100%",
+          }}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+        />
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.content}
+          bounces={true}
+        >
+          <View style={styles.header}>
+            <Text style={[styles.displayLg, { color: signColor }]}>
+              {data?.sign?.toUpperCase()}
+            </Text>
+            <Text style={styles.displayMd}>
+              {todayDate.toLocaleDateString(undefined, options)}
             </Text>
           </View>
-        </View>
 
-        <View style={styles.roastIncipit}>
-          <Text style={styles.roastText}>{data?.hook}</Text>
-        </View>
+          <View style={styles.dataGrid}>
+            <Text style={styles.date}>Cosmic event of the day </Text>
+            <View style={styles.dataBlock}>
+              {isCosmicEventLoading ||
+                (isCosmicEventError && (
+                  <Text style={styles.dataValue}>No cosmic event today</Text>
+                ))}
+              <Text style={[styles.dataValue, { textTransform: "capitalize" }]}>
+                {cosmicEventData?.type}: {cosmicEventData?.evenement}
+              </Text>
+            </View>
+          </View>
 
-        <View style={styles.divider} />
+          <View style={styles.roastIncipit}>
+            <Text style={styles.roastText}>{data?.hook}</Text>
+          </View>
 
-        <View style={styles.roastIncipit}>
-          <Text style={styles.roastTextSecondary}>{data?.content}</Text>
-        </View>
-        <View style={styles.adviceContainer}>
-          <Text style={[styles.labelMd, { color: signColor }]}>
-            COSMIC_ADVICE
-          </Text>
-          <Text style={styles.adviceText}>{data?.advice}</Text>
-        </View>
+          <View style={styles.divider} />
 
-        <View style={styles.ctaContainer}>
-          <TouchableOpacity
-            style={[styles.secondaryButton, { backgroundColor: signColor }]}
-          >
-            <Text style={styles.secondaryButtonText}>SHARE THIS ROAST</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.secondaryButton,
-              {
-                marginTop: 10,
-                backgroundColor: COLORS.void,
-                borderColor: signColor,
-              },
-            ]}
-          >
-            <Text style={[styles.secondaryButtonText, { color: signColor }]}>
-              SEE HOW YOUR FRIENDS ARE SUFFERING
+          <View style={styles.roastIncipit}>
+            <Text style={styles.roastTextSecondary}>{data?.content}</Text>
+          </View>
+          <View style={styles.adviceContainer}>
+            <Text style={[styles.labelMd, { color: signColor }]}>
+              COSMIC ADVICE
             </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
+            <Text style={styles.adviceText}>{data?.advice}</Text>
+          </View>
+
+          <View style={styles.ctaContainer}>
+            <TouchableOpacity
+              style={[styles.secondaryButton, { backgroundColor: signColor }]}
+              onPress={handleShare}
+            >
+              <Text style={styles.secondaryButtonText}>SHARE THIS ROAST</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.secondaryButton,
+                {
+                  marginTop: 10,
+                  backgroundColor: COLORS.void,
+                  borderColor: signColor,
+                },
+              ]}
+            >
+              <Text style={[styles.secondaryButtonText, { color: signColor }]}>
+                SEE HOW YOUR FRIENDS ARE SUFFERING
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {/* Share Card is rendered in the DOM but is hidden, it will be captured
+      when the user click on share and then deleted after sharing */}
+          {/* <View style={{ position: "absolute", left: -5000 }}> */}
+          {data && (
+            <ShareCard
+              sign={data?.sign}
+              hook={data?.hook}
+              roast={data?.content}
+              signColor={signColor}
+              date={todayDate}
+              advice={data?.advice}
+              viewRef={cardRef}
+            />
+          )}
+          {/* </View> */}
+        </ScrollView>
+      </View>
+    </>
   );
 };
 
@@ -173,12 +237,12 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: -1,
   },
-  header: { marginBottom: 40 },
+  header: { marginBottom: 40, marginTop: 40 },
   labelMd: {
     color: COLORS.primary,
-    fontSize: 12,
+    fontSize: 16,
     letterSpacing: 2,
-    fontWeight: "700",
+    fontWeight: "800",
     marginBottom: 8,
   },
   labelSm: {
@@ -192,17 +256,17 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     backgroundColor: COLORS.surfaceLow,
     marginBottom: 40,
-    gap: 20,
+    gap: 8,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary,
     padding: 15,
   },
-  date: { color: "#666", fontSize: 14 },
+  date: { color: "#666", fontSize: 12 },
   dataBlock: { flex: 1 },
   dataValue: {
     color: COLORS.primary,
-    fontSize: 14,
-    fontWeight: "800",
+    fontSize: 16,
+    fontWeight: "400",
   },
   roastIncipit: {
     marginBottom: 20,
@@ -231,14 +295,13 @@ const styles = StyleSheet.create({
   },
   adviceContainer: {
     backgroundColor: COLORS.surfaceLow,
-    padding: 25,
+    padding: 15,
     marginBottom: 40,
   },
   adviceText: {
     color: COLORS.primary,
     fontSize: 16,
     lineHeight: 24,
-    marginTop: 10,
   },
   ctaContainer: { marginBottom: 40 },
   secondaryButton: {
