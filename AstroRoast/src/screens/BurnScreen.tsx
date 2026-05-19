@@ -187,19 +187,19 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
           </View>
           {/* Share Card is rendered in the DOM but is hidden, it will be captured
       when the user click on share and then deleted after sharing */}
-          {/* <View style={{ position: "absolute", left: -5000 }}> */}
-          {data && (
-            <ShareCard
-              sign={data?.sign}
-              hook={data?.hook}
-              roast={data?.content}
-              signColor={signColor}
-              date={todayDate}
-              advice={data?.advice}
-              viewRef={cardRef}
-            />
-          )}
-          {/* </View> */}
+          <View style={{ position: "absolute", left: -5000 }}>
+            {data && (
+              <ShareCard
+                sign={data?.sign}
+                hook={data?.hook}
+                roast={data?.content}
+                signColor={signColor}
+                date={todayDate}
+                advice={data?.advice}
+                viewRef={cardRef}
+              />
+            )}
+          </View>
         </ScrollView>
       </View>
     </>
