@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import { setAppIcon } from "../lib/iconManager";
+import { initializeIconManager } from "../lib/iconManager";
 
 type AuthContextType = {
   session: Session | null;
@@ -17,6 +19,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Initialiser le gestionnaire d'icônes au démarrage
+    initializeIconManager();
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -25,7 +30,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     return () => subscription?.unsubscribe();
-  }, []);
+  },// Réinitialiser l'icône à celle par défaut
+    await setAppIcon(null);
+     []);
 
   const signOut = async () => {
     await supabase.auth.signOut();

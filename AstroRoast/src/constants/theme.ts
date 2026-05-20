@@ -9,14 +9,14 @@ export const COLORS = {
 export const SIGN_COLORS: Record<string, string> = {
   Aries: "#FF562B",
   Taurus: "#4cd964",
-  Gemini: "#FFD60A",
+  Gemini: "#FA3ECE",
   Cancer: "#81D4FA",
   Leo: "#FFD60A",
   Virgo: "#A7F220",
   Libra: "#F8BBD0",
-  Scorpio: "#FF2D55",
-  Sagittarius: "#5856D6",
+  Scorpio: "#EC2828",
+  Sagittarius: "#B552FF",
   Capricorn: "#2962FF",
   Aquarius: "#00BDC9",
-  Pisces: "#0288D1",
+  Pisces: "#02D18C",
 };

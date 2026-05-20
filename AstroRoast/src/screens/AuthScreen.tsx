@@ -11,6 +11,7 @@ import {
 import { supabase } from "../lib/supabase";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { AstroSign } from "../types/database";
+import { setAppIcon } from "../lib/iconManager";
 
 import { AuthScreenProps } from "../types/navigation";
 
@@ -52,6 +53,8 @@ export const AuthScreen: React.FC<AuthScreenProps> = () => {
       if (error) {
         Alert.alert("Creation Error", error.message);
       } else {
+        // Changer l'icône de l'app selon le signe zodiacal
+        await setAppIcon(selectedSign);
         Alert.alert("Success", "Check your emails to confirm your account!");
       }
     }

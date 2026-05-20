@@ -13,20 +13,58 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.astroroast.app",
+      "alternateIcons": {
+        "aries": {
+          "image": "./assets/icons/ios/zodiac/aries.png"
+        },
+        "taurus": {
+          "image": "./assets/icons/ios/zodiac/taurus.png"
+        },
+        "gemini": {
+          "image": "./assets/icons/ios/zodiac/gemini.png"
+        },
+        "cancer": {
+          "image": "./assets/icons/ios/zodiac/cancer.png"
+        },
+        "leo": {
+          "image": "./assets/icons/ios/zodiac/leo.png"
+        },
+        "virgo": {
+          "image": "./assets/icons/ios/zodiac/virgo.png"
+        },
+        "libra": {
+          "image": "./assets/icons/ios/zodiac/libra.png"
+        },
+        "scorpio": {
+          "image": "./assets/icons/ios/zodiac/scorpio.png"
+        },
+        "sagittarius": {
+          "image": "./assets/icons/ios/zodiac/sagittarius.png"
+        },
+        "capricorn": {
+          "image": "./assets/icons/ios/zodiac/capricorn.png"
+        },
+        "aquarius": {
+          "image": "./assets/icons/ios/zodiac/aquarius.png"
+        },
+        "pisces": {
+          "image": "./assets/icons/ios/zodiac/pisces.png"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0e0e0e"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.astroroast.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     },
-    "plugins": [
-      "expo-font"
-    ]
+    "plugins": ["expo-font"]
   }
 }
