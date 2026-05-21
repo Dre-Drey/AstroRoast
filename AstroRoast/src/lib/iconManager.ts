@@ -99,6 +99,9 @@ export async function initializeIconManager(): Promise<void> {
       await _updateAppIcon(currentIcon);
     }
   } catch (error) {
-    console.error("Erreur lors de l'initialisation du gestionnaire d'icônes:", error);
+    console.error(
+      "Erreur lors de l'initialisation du gestionnaire d'icônes:",
+      error,
+    );
   }
 }

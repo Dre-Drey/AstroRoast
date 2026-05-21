@@ -30,9 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     });
 
     return () => subscription?.unsubscribe();
-  },// Réinitialiser l'icône à celle par défaut
-    await setAppIcon(null);
-     []);
+  }, []);
 
   const signOut = async () => {
     await supabase.auth.signOut();
