@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
+import {
+  Alert,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { COLORS } from "../constants/theme";
 import { supabase } from "../lib/supabase";
 import { ProfileScreenProps } from "../types/navigation";
@@ -7,6 +14,7 @@ import { ProfileScreenProps } from "../types/navigation";
 export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   const [email, setEmail] = useState<string | undefined>("");
   const [sign, setSign] = useState<string>("");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   useEffect(() => {
     async function getProfile() {
@@ -69,6 +77,21 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
         </View>
       </View>
 
+      <View style={styles.settingsSection}>
+        <View style={styles.settingRow}>
+          <View style={styles.settingTextBlock}>
+            <Text style={styles.settingTitle}>ENABLE_NOTIFICATIONS</Text>
+          </View>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={setNotificationsEnabled}
+            trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
+            thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
+            ios_backgroundColor={COLORS.surfaceLow}
+          />
+        </View>
+      </View>
+
       <View style={styles.actionSection}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
           <Text style={styles.logoutText}>LOGOUT_SESSION</Text>
@@ -117,6 +140,25 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceLow,
     padding: 20,
     marginBottom: 2,
+  },
+  settingsSection: {
+    marginBottom: 60,
+  },
+  settingRow: {
+    backgroundColor: COLORS.surfaceLow,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  settingTextBlock: {
+    flex: 1,
+  },
+  settingTitle: {
+    color: COLORS.primary,
+    fontSize: 16,
+    fontWeight: "800",
   },
   infoValue: {
     color: COLORS.primary,
