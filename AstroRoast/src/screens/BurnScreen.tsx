@@ -20,6 +20,7 @@ import ShareCard from "../components/ShareCard";
 
 export const BurnScreen: React.FC<BurnScreenProps> = () => {
   const cardRef = useRef(null);
+  const notificationEnabled = false; // Placeholder for notification toggle state
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["dailyRoast"],
     queryFn: () => fetchDailyRoast(),
@@ -191,23 +192,42 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
                 SEE HOW YOUR FRIENDS ARE SUFFERING
               </Text>
             </TouchableOpacity>
-          </View>
-          {/* Share Card is rendered in the DOM but is hidden, it will be captured
-      when the user click on share and then deleted after sharing */}
-          <View style={{ position: "absolute", left: -5000 }}>
-            {data && (
-              <ShareCard
-                sign={data?.sign}
-                hook={data?.hook}
-                roast={data?.content}
-                signColor={signColor}
-                date={todayDate}
-                advice={data?.advice}
-                viewRef={cardRef}
-              />
+            {!notificationEnabled && (
+              <TouchableOpacity
+                style={{ marginTop: 10 }}
+                onPress={() => alert("Feature coming soon!")}
+              >
+                <Text
+                  style={[
+                    styles.labelSm,
+                    {
+                      textAlign: "center",
+                      color: COLORS.primary,
+                      textDecorationLine: "underline",
+                    },
+                  ]}
+                >
+                  ENABLE NOTIFICATIONS
+                </Text>
+              </TouchableOpacity>
             )}
           </View>
         </ScrollView>
+      </View>
+      {/* Share Card is rendered in the DOM but is hidden, it will be captured
+      when the user click on share and then deleted after sharing */}
+      <View style={{ position: "absolute", left: -5000 }}>
+        {data && (
+          <ShareCard
+            sign={data?.sign}
+            hook={data?.hook}
+            roast={data?.content}
+            signColor={signColor}
+            date={todayDate}
+            advice={data?.advice}
+            viewRef={cardRef}
+          />
+        )}
       </View>
     </>
   );
