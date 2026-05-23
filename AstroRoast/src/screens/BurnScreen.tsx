@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-
+import { Flame } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { fetchDailyRoast, fetchCosmicEvent } from "../actions";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
@@ -119,6 +119,13 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
           }}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
+        />
+        <Flame
+          size={450}
+          fill={COLORS.surfaceHigh}
+          stroke={COLORS.surfaceHigh}
+          opacity={0.6}
+          style={styles.flameBackground}
         />
         <ScrollView
           style={styles.container}
@@ -229,6 +236,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 4,
     borderBottomColor: COLORS.primary,
     width: "75%",
+  },
+  flameBackground: {
+    position: "absolute",
+    left: 50,
+    top: 20,
+    zIndex: 0,
   },
   displayMd: {
     color: COLORS.primary,
