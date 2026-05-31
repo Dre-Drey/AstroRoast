@@ -3,6 +3,10 @@ import { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { setAppIcon } from "../lib/iconManager";
 import { initializeIconManager } from "../lib/iconManager";
+import {
+  registerForPushNotificationsAsync,
+  syncPushToken,
+} from "../lib/notifications";
 
 type AuthContextType = {
   session: Session | null;
@@ -40,6 +44,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setSession(null);
         setLoading(false);
+        // If a session exists, sync the push token with the backend
+        if (session?.user) {
+          syncPushToken(session.user.id);
+        }
       });
 
     const {
@@ -47,6 +55,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setLoading(false);
+
+      if (
+        session?.user &&
+        (_event === "SIGNED_IN" || _event === "TOKEN_REFRESHED")
+      ) {
+        syncPushToken(session.user.id);
+      }
     });
 
     return () => {
@@ -56,6 +71,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const signOut = async () => {
+    // remove push token from the backend on signout to prevent sending notifications to signed-out users
+    if (session?.user) {
+      await supabase
+        .from("profiles")
+        .update({ expo_push_token: null })
+        .eq("id", session.user.id);
+    }
     await supabase.auth.signOut();
     setSession(null);
   };
