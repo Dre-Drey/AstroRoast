@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   StyleSheet,
   Switch,
@@ -10,8 +11,11 @@ import {
 import { COLORS } from "../constants/theme";
 import { supabase } from "../lib/supabase";
 import { ProfileScreenProps } from "../types/navigation";
+import { useAuth } from "../contexts/AuthContext";
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
+  const { session, signOut, loading } = useAuth();
+
   const [email, setEmail] = useState<string | undefined>("");
   const [sign, setSign] = useState<string>("");
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -35,8 +39,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   }, []);
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) Alert.alert("Error", error.message);
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -58,52 +65,74 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator color={COLORS.primary} />
+        <Text style={[styles.labelMd, { marginTop: 20 }]}>
+          READING_STARS...
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.displayMd}>PROFIL</Text>
-        <Text style={styles.labelMd}>[ ID_ENTITY_CONFIRMED ]</Text>
-      </View>
-
-      <View style={styles.infoSection}>
-        <View style={styles.infoBlock}>
-          <Text style={styles.labelSm}>EMAIL_LOG</Text>
-          <Text style={styles.infoValue}>{email?.toUpperCase()}</Text>
-        </View>
-
-        <View style={styles.infoBlock}>
-          <Text style={styles.labelSm}>ASTRO_ASSIGNMENT</Text>
-          <Text style={styles.infoValue}>{sign.toUpperCase()}</Text>
-        </View>
-      </View>
-
-      <View style={styles.settingsSection}>
-        <View style={styles.settingRow}>
-          <View style={styles.settingTextBlock}>
-            <Text style={styles.settingTitle}>ENABLE_NOTIFICATIONS</Text>
+      {session ? (
+        <>
+          <View style={styles.header}>
+            <Text style={styles.displayMd}>PROFIL</Text>
+            <Text style={styles.labelMd}>[ID_ENTITY_CONFIRMED]</Text>
           </View>
-          <Switch
-            value={notificationsEnabled}
-            onValueChange={setNotificationsEnabled}
-            trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
-            thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
-            ios_backgroundColor={COLORS.surfaceLow}
-          />
+
+          <View style={styles.infoSection}>
+            <View style={styles.infoBlock}>
+              <Text style={styles.labelSm}>EMAIL_LOG</Text>
+              <Text style={styles.infoValue}>{email?.toUpperCase()}</Text>
+            </View>
+
+            <View style={styles.infoBlock}>
+              <Text style={styles.labelSm}>ASTRO_ASSIGNMENT</Text>
+              <Text style={styles.infoValue}>{sign.toUpperCase()}</Text>
+            </View>
+          </View>
+
+          <View style={styles.settingsSection}>
+            <View style={styles.settingRow}>
+              <View style={styles.settingTextBlock}>
+                <Text style={styles.settingTitle}>ENABLE_NOTIFICATIONS</Text>
+              </View>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={setNotificationsEnabled}
+                trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
+                thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
+                ios_backgroundColor={COLORS.surfaceLow}
+              />
+            </View>
+          </View>
+
+          <View style={styles.actionSection}>
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleSignOut}
+            >
+              <Text style={styles.logoutText}>LOGOUT_SESSION</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleDeleteAccount}
+            >
+              <Text style={styles.deleteText}>DELETE_ACCOUNT</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      ) : (
+        <View style={styles.center}>
+          <Text style={styles.labelMd}>CONNECT_TO_ACCESS_PROFILE</Text>
         </View>
-      </View>
-
-      <View style={styles.actionSection}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-          <Text style={styles.logoutText}>LOGOUT_SESSION</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={handleDeleteAccount}
-        >
-          <Text style={styles.deleteText}>DELETE_ACCOUNT</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </View>
   );
 };
@@ -116,6 +145,13 @@ const styles = StyleSheet.create({
     paddingTop: 80,
   },
   header: { marginBottom: 60 },
+  center: {
+    flex: 1,
+    backgroundColor: COLORS.void,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
   displayMd: {
     color: COLORS.primary,
     fontSize: 48,
@@ -138,7 +174,6 @@ const styles = StyleSheet.create({
   infoSection: { marginBottom: 60 },
   infoBlock: {
     backgroundColor: COLORS.surfaceLow,
-    padding: 20,
     marginBottom: 2,
   },
   settingsSection: {
@@ -146,7 +181,6 @@ const styles = StyleSheet.create({
   },
   settingRow: {
     backgroundColor: COLORS.surfaceLow,
-    padding: 20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

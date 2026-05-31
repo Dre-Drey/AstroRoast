@@ -17,8 +17,10 @@ import { fetchDailyRoast, fetchCosmicEvent } from "../actions";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { BurnScreenProps } from "../types/navigation";
 import ShareCard from "../components/ShareCard";
+import { useAuth } from "../contexts/AuthContext";
 
 export const BurnScreen: React.FC<BurnScreenProps> = () => {
+  const { session, loading } = useAuth();
   const cardRef = useRef(null);
   const notificationEnabled = false; // Placeholder for notification toggle state
   const { data, isLoading, isError, error } = useQuery({
@@ -46,7 +48,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
     day: "numeric",
   };
 
-  if (isLoading) {
+  if (isLoading || loading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator color={COLORS.primary} />
@@ -106,7 +108,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
     }
   };
 
-  return (
+  return session ? (
     <>
       <View style={styles.void}>
         <LinearGradient
@@ -230,6 +232,13 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
         )}
       </View>
     </>
+  ) : (
+    <View style={styles.center}>
+      <Text style={styles.displayMd}>NO SESSION</Text>
+      <Text style={styles.errorText}>
+        Connecte-toi pour voir ton Daily Roast
+      </Text>
+    </View>
   );
 };
 

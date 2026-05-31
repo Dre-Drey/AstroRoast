@@ -13,9 +13,7 @@ import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { AstroSign } from "../types/database";
 import { setAppIcon } from "../lib/iconManager";
 
-import { AuthScreenProps } from "../types/navigation";
-
-export const AuthScreen: React.FC<AuthScreenProps> = () => {
+export const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
