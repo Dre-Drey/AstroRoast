@@ -12,7 +12,7 @@ if (!EXPO_PUBLIC_SUPABASE_URL || !SERVICE_ROLE_KEY || !MISTRAL_API_KEY) {
 }
 
 const supabase = createClient(EXPO_PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
-const mistral = new Mistral({ apiKey: MISTRAL_API_KEY });
+const mistral = new Mistral({ apiKey: MISTRAL_API_KEY, timeoutMs: 60000 });
 
 interface CosmicEvent {
   id: string;
@@ -103,9 +103,12 @@ async function generateRoastsForEvent(
     styleHint,
     seed,
   });
-  const MAX_RETRIES = 1;
+  const MAX_RETRIES = 3;
+  const RETRYABLE_ERRORS = ["TimeoutError", "429", "500", "503"];
 
-  console.log(`Generating roasts for ${event.description} - ${event.date}`);
+  console.log(
+    `Generating roasts for ${event.description} - ${event.date} in style: ${styleHint} (seed: ${seed})`,
+  );
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
@@ -124,31 +127,38 @@ async function generateRoastsForEvent(
         ? raw.map((b: any) => b.text ?? "").join("")
         : raw;
 
-      const parsed = JSON.parse(text);
-
-      // Basic validation of response
-      if (!Array.isArray(parsed?.roasts) || parsed.roasts.length === 0) {
-        throw new Error(`Unexpected JSON shape: missing "roasts" array`);
-      }
-
-      for (const entry of parsed.roasts as RoastEntry[]) {
-        const canonicalSign = ZODIAC_SIGNS.find(
-          (s) => s.toLowerCase() === entry.sign?.toLowerCase(),
-        );
-        if (!canonicalSign) {
-          console.warn(`Unknown sign in response: ${entry.sign} — skipped`);
-          continue;
+      try {
+        const parsed = JSON.parse(text);
+        if (
+          !parsed.roasts ||
+          !Array.isArray(parsed.roasts) ||
+          parsed.roasts.length === 0
+        ) {
+          throw new Error("Parsed JSON does not contain a 'roasts' array");
         }
-        const normalized = normalizeRoast(entry);
-        if (normalized) {
-          results.set(canonicalSign, normalized);
-        } else {
-          console.warn(
-            `Incomplete roast for ${entry.sign} — will use fallback`,
+
+        for (const entry of parsed.roasts as RoastEntry[]) {
+          const canonicalSign = ZODIAC_SIGNS.find(
+            (s) => s.toLowerCase() === entry.sign?.toLowerCase(),
           );
+          if (!canonicalSign) {
+            console.warn(`Unknown sign in response: ${entry.sign} — skipped`);
+            continue;
+          }
+          const normalized = normalizeRoast(entry);
+          if (normalized) {
+            results.set(canonicalSign, normalized);
+          } else {
+            console.warn(
+              `Incomplete roast for ${entry.sign} — will use fallback`,
+            );
+          }
         }
+      } catch (parseError: any) {
+        throw new Error(
+          `Failed to parse model response as JSON: ${parseError?.message}`,
+        );
       }
-
       // Vérifier que les 12 signes sont couverts
       const missingSigns = ZODIAC_SIGNS.filter((s) => !results.has(s));
       if (missingSigns.length > 0) {
@@ -162,8 +172,16 @@ async function generateRoastsForEvent(
       console.warn(
         `Attempt ${attempt}/${MAX_RETRIES} failed for ${event.date}: ${err.message}`,
       );
-      if (attempt < MAX_RETRIES) {
-        await sleep(300 * Math.pow(2, attempt - 1)); // exponentional backoff : 300ms, 600ms
+      if (
+        attempt < MAX_RETRIES &&
+        RETRYABLE_ERRORS.some((e) => err.message.includes(e))
+      ) {
+        const delay = 300 * Math.pow(2, attempt - 1);
+        console.log(`Retrying after ${delay}ms...`);
+        await sleep(delay); // exponentional backoff : 300ms, 600ms
+        continue;
+      } else {
+        throw err; // non-retryable error or max attempts reached
       }
     }
   }
@@ -248,7 +266,7 @@ async function generateWeeklyRoasts(): Promise<void> {
     await upsertRoasts(event, roasts);
 
     // small delay to avoid rate limits
-    await sleep(500);
+    await sleep(2000);
   }
 
   console.log("\nGeneration completed.");
