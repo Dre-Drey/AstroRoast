@@ -2,210 +2,256 @@ import { createClient } from "@supabase/supabase-js";
 import { Mistral } from "@mistralai/mistralai";
 import "dotenv/config";
 import { ZODIAC_SIGNS } from "../constants";
+import { SYSTEM_PROMPT, buildUserPrompt, getRandomStyleHint } from "./prompts";
 
-const {
-  EXPO_PUBLIC_SUPABASE_URL,
-  SERVICE_ROLE_KEY,
-  MISTRAL_API_KEY,
-  MISTRAL_CONTENT_PROMPT_SYSTEM,
-} = process.env;
+const { EXPO_PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY, MISTRAL_API_KEY } =
+  process.env;
 
-if (
-  !EXPO_PUBLIC_SUPABASE_URL ||
-  !SERVICE_ROLE_KEY ||
-  !MISTRAL_API_KEY ||
-  !MISTRAL_CONTENT_PROMPT_SYSTEM
-) {
+if (!EXPO_PUBLIC_SUPABASE_URL || !SERVICE_ROLE_KEY || !MISTRAL_API_KEY) {
   throw new Error("Missing required environment variables");
 }
 
 const supabase = createClient(EXPO_PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY);
 const mistral = new Mistral({ apiKey: MISTRAL_API_KEY });
 
+interface CosmicEvent {
+  id: string;
+  date: string;
+  evenement: string;
+  type: string;
+  description: string;
+}
+
+interface RoastEntry {
+  sign: string;
+  hook?: string;
+  main_roast?: string;
+  cosmic_advice?: string;
+  content?: string;
+  advice?: string;
+  mainRoast?: string;
+  cosmicAdvice?: string;
+}
+
+interface NormalizedRoast {
+  hook: string;
+  content: string;
+  advice: string;
+}
+
 function sleep(ms: number) {
   return new Promise((res) => setTimeout(res, ms));
 }
 
-function safeParseJSON(input: string) {
-  try {
-    return JSON.parse(input);
-  } catch (e) {
-    return null;
+function trimRoastContent(
+  content: string,
+  maxLength = 400,
+  minSentenceEnd = 300,
+): string {
+  const trimmed = content.trim();
+
+  if (trimmed.length <= maxLength) {
+    return trimmed;
   }
+  // Search for a period, exclamation mark, or question mark after the minSentenceEnd position to avoid cutting off mid-sentence
+  const searchWindow = trimmed.slice(minSentenceEnd, maxLength);
+  const sentenceEndMatch = searchWindow.match(/[.!?](?=[^.!?]*$)/);
+
+  if (sentenceEndMatch?.index !== undefined) {
+    return trimmed.slice(0, minSentenceEnd + sentenceEndMatch.index + 1).trim();
+  }
+
+  return trimmed.slice(0, maxLength).trim();
 }
 
-function normalizeRoastData(parsed: any, sign: string) {
-  if (!parsed || typeof parsed !== "object") return null;
-  // Accept several possible key names coming from model output
-  const hook =
-    (parsed.roast_hook ?? parsed.hook ?? parsed.roastHook ?? parsed.roast) ||
-    parsed.roast_hook;
-  const content =
-    (parsed.main_roast ?? parsed.mainRoast ?? parsed.content ?? parsed.main) ||
-    parsed.main_roast;
-  const advice =
-    parsed.cosmic_advice ??
-    parsed.cosmicAdvice ??
-    parsed.advice ??
-    parsed.advice_text;
+function normalizeRoast(entry: RoastEntry): NormalizedRoast | null {
+  const hook = entry.hook?.trim();
+  const content = trimRoastContent(
+    entry.main_roast ?? entry.content ?? entry.mainRoast ?? "",
+  );
+  const advice = (
+    entry.cosmic_advice ??
+    entry.advice ??
+    entry.cosmicAdvice ??
+    ""
+  ).trim();
 
   if (!hook || !content || !advice) return null;
 
-  // enforce max lengths
-  const MAX_CONTENT = 400;
-  const cleanContent =
-    typeof content === "string"
-      ? content.trim().slice(0, MAX_CONTENT)
-      : String(content).slice(0, MAX_CONTENT);
-  return {
-    hook: String(hook).trim(),
-    content: cleanContent,
-    advice: String(advice).trim(),
-  };
+  return { hook, content, advice };
 }
 
-function generateFallbackRoast(sign: string, eventDescription: string) {
+function generateFallbackRoast(
+  sign: string,
+  eventDescription: string,
+): NormalizedRoast {
   const hook = `${sign} in the spotlight`;
-  const content =
-    `${sign}: cosmic vibes collide with ${eventDescription}. A cheeky roast for the sign — witty, sharp, harmless.`.slice(
-      0,
-      400,
-    );
+  const content = `${sign}: cosmic vibes collide with ${eventDescription}. A cheeky roast for the sign — witty, sharp, harmless.`;
   const advice = "Take a breath, not the spotlight.";
   return { hook, content, advice };
 }
 
-async function generateWeeklyRoasts() {
-  // default is tomorrow date, but we can specify a date for testing purposes
+async function generateRoastsForEvent(
+  event: CosmicEvent,
+  styleHint: string,
+  seed: number,
+): Promise<Map<string, NormalizedRoast>> {
+  const results = new Map<string, NormalizedRoast>();
+  const userPrompt = buildUserPrompt({
+    date: event.date,
+    eventDescription: event.description,
+    styleHint,
+    seed,
+  });
+  const MAX_RETRIES = 1;
+
+  console.log(`Generating roasts for ${event.description} - ${event.date}`);
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await mistral.chat.complete({
+        model: "mistral-large-latest",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
+        ],
+        responseFormat: { type: "json_object" },
+        maxTokens: 4096,
+      });
+
+      const raw = response.choices?.[0]?.message?.content ?? "";
+      const text = Array.isArray(raw)
+        ? raw.map((b: any) => b.text ?? "").join("")
+        : raw;
+
+      const parsed = JSON.parse(text);
+
+      // Basic validation of response
+      if (!Array.isArray(parsed?.roasts) || parsed.roasts.length === 0) {
+        throw new Error(`Unexpected JSON shape: missing "roasts" array`);
+      }
+
+      for (const entry of parsed.roasts as RoastEntry[]) {
+        const canonicalSign = ZODIAC_SIGNS.find(
+          (s) => s.toLowerCase() === entry.sign?.toLowerCase(),
+        );
+        if (!canonicalSign) {
+          console.warn(`Unknown sign in response: ${entry.sign} — skipped`);
+          continue;
+        }
+        const normalized = normalizeRoast(entry);
+        if (normalized) {
+          results.set(canonicalSign, normalized);
+        } else {
+          console.warn(
+            `Incomplete roast for ${entry.sign} — will use fallback`,
+          );
+        }
+      }
+
+      // Vérifier que les 12 signes sont couverts
+      const missingSigns = ZODIAC_SIGNS.filter((s) => !results.has(s));
+      if (missingSigns.length > 0) {
+        throw new Error(
+          `Missing signs in response: ${missingSigns.join(", ")}`,
+        );
+      }
+
+      return results;
+    } catch (err: any) {
+      console.warn(
+        `Attempt ${attempt}/${MAX_RETRIES} failed for ${event.date}: ${err.message}`,
+      );
+      if (attempt < MAX_RETRIES) {
+        await sleep(300 * Math.pow(2, attempt - 1)); // exponentional backoff : 300ms, 600ms
+      }
+    }
+  }
+  // Fallback for missing signs after retries exhausted
+  console.error(
+    `Model failed after ${MAX_RETRIES} attempts for ${event.date}. Fallback applied to missing signs.`,
+  );
+  for (const sign of ZODIAC_SIGNS) {
+    if (!results.has(sign)) {
+      results.set(sign, generateFallbackRoast(sign, event.description));
+    }
+  }
+
+  return results;
+}
+
+async function upsertRoasts(
+  event: CosmicEvent,
+  roasts: Map<string, NormalizedRoast>,
+): Promise<void> {
+  const rows = Array.from(roasts.entries()).map(([sign, roast]) => ({
+    sign,
+    date: event.date,
+    hook: roast.hook,
+    content: roast.content,
+    advice: roast.advice,
+    event_id: event.id,
+  }));
+
+  const { error } = await supabase.from("daily_roasts").upsert(rows, {
+    onConflict: "date,sign",
+  });
+
+  if (error) {
+    console.error(
+      `Failed to upsert roasts for ${event.date}: ${error.message}`,
+    );
+  } else {
+    console.log(`Successfully upserted roasts for ${event.date}`);
+  }
+}
+
+// MAIN FUNCTION
+async function generateWeeklyRoasts(): Promise<void> {
+  const NUMBER_OF_DAYS = 2; // adjust as needed
   const startDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
     .toISOString()
     .split("T")[0];
 
-  // 1. Get the cosmic event for a week from Supabase
   const { data: events, error } = await supabase
     .from("cosmic_events")
     .select("*")
     .gte("date", startDate)
     .order("date", { ascending: true })
-    .limit(2);
+    .limit(NUMBER_OF_DAYS); // default is one week, to adjust
 
   if (error) {
-    console.error("Error fetching events from Supabase:", error);
+    console.error("Error fetching events:", error);
     return;
   }
 
   if (!events || events.length === 0) {
-    console.log(`No event found, skipping...`);
+    console.log("No upcoming events found — nothing to generate.");
     return;
   }
 
   console.log(
-    `Generating roasts for ${events.length} events starting from ${startDate}`,
+    `Generating roasts for ${NUMBER_OF_DAYS} day(s) from ${startDate}`,
   );
 
-  for (const event of events) {
-    console.log(`--- Day : ${event.date} (${event.description}) ---`);
-    for (const sign of ZODIAC_SIGNS) {
-      try {
-        // Retry logic for external model call
-        const maxRetries = 3;
-        let attempt = 0;
-        let lastError: any = null;
-        let parsedNormalized: any = null;
+  // Generate and upsert roasts for each cosmic event
+  for (const event of events as CosmicEvent[]) {
+    // For each event, we generate a unique style hint and seed to ensure variety even if the same event appears in multiple batches.
+    const seed = Math.floor(Math.random() * 99999);
+    const styleHint = getRandomStyleHint();
 
-        while (attempt < maxRetries && !parsedNormalized) {
-          attempt += 1;
-          try {
-            const response = await mistral.chat.complete({
-              model: "mistral-small-latest",
-              messages: [
-                {
-                  role: "system",
-                  content:
-                    MISTRAL_CONTENT_PROMPT_SYSTEM ||
-                    "The prompt is missing, do not generate a roast without it.",
-                },
-                {
-                  role: "user",
-                  content: `Today's cosmic event is: ${event.description}. The sign is ${sign}. Generate a roast of 400 characters for this sign based on the cosmic event and the zodiac sign's traits. The roast should be witty, aggressive but never mean or cruel, and should not exceed 400 characters. Also provide a passive-aggressive cosmic advice in 10 words max and a hook for the roast. Output format (JSON only, strictly this format): { "astro_sign": "${sign}", "roast_hook": "<hook>", "main_roast": "<main>", "cosmic_advice": "<advice>" }`,
-                },
-              ],
-              responseFormat: { type: "json_object" },
-            });
+    console.log(`\n--- ${event.date} : ${event.description} ---`);
+    const roasts = await generateRoastsForEvent(event, styleHint, seed);
+    console.log(
+      `\n--- ${event.date} : Roasts generated, now upserting to database... ---`,
+    );
+    await upsertRoasts(event, roasts);
 
-            // Basic validation of response
-            if (
-              !response ||
-              !response.choices ||
-              response.choices.length === 0
-            ) {
-              lastError = new Error("Empty response from model");
-              throw lastError;
-            }
-
-            const raw = response.choices[0].message?.content ?? "";
-            const parsed =
-              safeParseJSON(raw) ||
-              safeParseJSON(Array.isArray(raw) ? raw[0] : raw);
-            parsedNormalized = normalizeRoastData(parsed, sign);
-            if (!parsedNormalized) {
-              lastError = new Error("Model returned unexpected JSON structure");
-              throw lastError;
-            }
-          } catch (e) {
-            lastError = e;
-            const backoff = 200 * Math.pow(2, attempt - 1);
-            console.warn(
-              `Attempt ${attempt} failed for ${sign} on ${event.date}:`,
-              e?.message || e,
-            );
-            if (attempt < maxRetries) await sleep(backoff);
-          }
-        }
-
-        if (!parsedNormalized) {
-          console.error(
-            `Model failed after ${maxRetries} attempts for ${sign} on ${event.date}. Using fallback.`,
-          );
-          parsedNormalized = generateFallbackRoast(
-            sign,
-            event.description || "the sky",
-          );
-        }
-
-        // 2. Insert into Supabase
-        const { error: insertError } = await supabase
-          .from("daily_roasts")
-          .upsert(
-            {
-              sign,
-              date: event.date,
-              hook: parsedNormalized.hook,
-              content: parsedNormalized.content,
-              advice: parsedNormalized.advice,
-              event_id: event.id,
-            },
-            { onConflict: "date,sign" },
-          );
-
-        if (insertError) {
-          console.error(
-            `Supabase insert error for ${sign} on ${event.date}:`,
-            insertError,
-          );
-        } else {
-          console.log(`${sign} done.`);
-        }
-        console.log(parsedNormalized);
-
-        // small delay to avoid rate limits
-        await sleep(150);
-      } catch (err) {
-        console.error(`Unhandled error for ${sign} on ${event.date}:`, err);
-      }
-    }
+    // small delay to avoid rate limits
+    await sleep(500);
   }
-  console.log("Roasts generation completed!");
+
+  console.log("\nGeneration completed.");
 }
 
 generateWeeklyRoasts();
