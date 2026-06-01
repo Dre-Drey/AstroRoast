@@ -3,6 +3,7 @@ import type { RefObject } from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Flame } from "lucide-react-native";
 import { COLORS } from "../constants/theme";
+import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 const { width } = Dimensions.get("window");
 
 type ShareCardProps = {
@@ -42,7 +43,7 @@ export default function ShareCard({
 
         <View style={styles.divider} />
 
-        <Text style={styles.mainRoast}>{roast}</Text>
+        <Text style={styles.mainRoast}>{renderInlineMarkdown(roast)}</Text>
       </View>
       <View style={styles.adviceBox}>
         <Text style={{ color: signColor }}>COSMIC_ADVICE</Text>
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   },
   signTitle: {
     color: COLORS.void,
-    fontSize: 52,
+    fontSize: 50,
     fontWeight: "400",
     marginTop: 5,
   },
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
   },
   hookText: {
     color: COLORS.void,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
     textAlign: "left",
     fontStyle: "italic",
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     width: "40%",
     height: 2,
     backgroundColor: COLORS.void,
-    marginVertical: 20,
+    marginVertical: 16,
     borderRadius: 1,
   },
   mainRoast: {
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
   },
   adviceBox: {
     marginTop: 25,
-    padding: 15,
+    padding: 12,
     backgroundColor: COLORS.void,
     width: "100%",
     zIndex: 1,
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "900",
     textAlign: "center",
-    marginBottom: 5,
+    marginBottom: 4,
     letterSpacing: 1.5,
   },
   adviceText: {
@@ -145,6 +146,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "left",
     fontWeight: "600",
-    marginVertical: 10,
+    marginVertical: 8,
   },
 });

@@ -18,6 +18,7 @@ import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { BurnScreenProps } from "../types/navigation";
 import ShareCard from "../components/ShareCard";
 import { useAuth } from "../contexts/AuthContext";
+import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 
 export const BurnScreen: React.FC<BurnScreenProps> = () => {
   const { session, loading } = useAuth();
@@ -127,7 +128,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
           size={450}
           fill={COLORS.surfaceHigh}
           stroke={COLORS.surfaceHigh}
-          opacity={0.6}
+          opacity={0.8}
           style={styles.flameBackground}
         />
         <ScrollView
@@ -151,8 +152,11 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
                 (isCosmicEventError && (
                   <Text style={styles.dataValue}>No cosmic event today</Text>
                 ))}
-              <Text style={[styles.dataValue, { textTransform: "capitalize" }]}>
-                {cosmicEventData?.type}: {cosmicEventData?.evenement}
+              <Text style={[styles.dataValue]}>
+                <Text style={{ textTransform: "capitalize" }}>
+                  {cosmicEventData?.type}:
+                </Text>{" "}
+                {cosmicEventData?.evenement}
               </Text>
             </View>
           </View>
@@ -164,7 +168,9 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
           <View style={styles.divider} />
 
           <View style={styles.roastIncipit}>
-            <Text style={styles.roastTextSecondary}>{data?.content}</Text>
+            <Text style={styles.roastTextSecondary}>
+              {renderInlineMarkdown(data?.content)}
+            </Text>
           </View>
           <View style={styles.adviceContainer}>
             <Text style={[styles.labelMd, { color: signColor }]}>
