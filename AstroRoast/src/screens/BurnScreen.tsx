@@ -186,7 +186,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
             >
               <Text style={styles.secondaryButtonText}>SHARE THIS ROAST</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={[
                 styles.secondaryButton,
                 {
@@ -199,7 +199,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
               <Text style={[styles.secondaryButtonText, { color: signColor }]}>
                 SEE HOW YOUR FRIENDS ARE SUFFERING
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             {!notificationEnabled && (
               <TouchableOpacity
                 style={{ marginTop: 10 }}

@@ -41,7 +41,8 @@ export async function registerForPushNotificationsAsync() {
       })
     ).data;
   } catch (e) {
-    token = `${e}`;
+    console.log(e);
+    token = null;
   }
 
   return token;

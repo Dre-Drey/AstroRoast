@@ -12,9 +12,12 @@ import { COLORS } from "../constants/theme";
 import { supabase } from "../lib/supabase";
 import { ProfileScreenProps } from "../types/navigation";
 import { useAuth } from "../contexts/AuthContext";
+import { registerForPushNotificationsAsync } from "../lib/notifications";
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   const { session, signOut, loading } = useAuth();
+  const [dataLoading, setDataLoading] = useState(true);
+  const [updatingNotifications, setUpdatingNotifications] = useState(false);
 
   const [email, setEmail] = useState<string | undefined>("");
   const [sign, setSign] = useState<string>("");
@@ -27,19 +30,31 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
       } = await supabase.auth.getUser();
       if (user) {
         setEmail(user.email);
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("profiles")
           .select("astro_sign, expo_push_token")
           .eq("id", user.id)
           .single();
+
+        if (error) {
+          console.error("Error fetching profile:", error);
+          Alert.alert(
+            "Error",
+            "An error occurred while fetching your profile information.",
+          );
+          setDataLoading(false);
+          return;
+        }
+
         if (data) {
           setSign(data.astro_sign);
           setNotificationsEnabled(!!data.expo_push_token);
+          setDataLoading(false);
         }
       }
     }
     getProfile();
-  }, []);
+  }, [session]);
 
   const handleSignOut = async () => {
     try {
@@ -68,12 +83,63 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
     );
   };
 
-  if (loading) {
+  const handleToggleNotifications = async (value: boolean) => {
+    setNotificationsEnabled(value);
+    if (!session?.user) return;
+    setUpdatingNotifications(true);
+
+    try {
+      if (value) {
+        // Register for push notifications and get the token
+        const token = await registerForPushNotificationsAsync();
+        if (!token) {
+          Alert.alert(
+            "Error",
+            "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
+          );
+          setUpdatingNotifications(false);
+          return;
+        }
+
+        const { error } = await supabase
+          .from("profiles")
+          .update({ expo_push_token: token })
+          .eq("id", session.user.id);
+
+        if (error) {
+          console.error("Error enabling notifications:", error);
+          throw new Error("Failed to enable notifications");
+        }
+        setNotificationsEnabled(true);
+      }
+      if (!value) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({ expo_push_token: null })
+          .eq("id", session.user.id);
+
+        if (error) {
+          console.error("Error disabling notifications:", error);
+          throw new Error("Failed to disable notifications");
+        }
+        setNotificationsEnabled(false);
+      }
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        "An error occurred while updating your notification settings. Please try again.",
+      );
+    } finally {
+      setUpdatingNotifications(false);
+    }
+  };
+
+  if (loading || dataLoading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator color={COLORS.primary} />
         <Text style={[styles.labelMd, { marginTop: 20 }]}>
-          READING_STARS...
+          ASKING FOR INFORMATION...
         </Text>
       </View>
     );
@@ -107,7 +173,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
               </View>
               <Switch
                 value={notificationsEnabled}
-                onValueChange={setNotificationsEnabled}
+                onValueChange={handleToggleNotifications}
+                disabled={updatingNotifications}
                 trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
                 thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
                 ios_backgroundColor={COLORS.surfaceLow}
