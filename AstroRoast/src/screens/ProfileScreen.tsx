@@ -29,10 +29,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
         setEmail(user.email);
         const { data } = await supabase
           .from("profiles")
-          .select("astro_sign")
+          .select("astro_sign, expo_push_token")
           .eq("id", user.id)
           .single();
-        if (data) setSign(data.astro_sign);
+        if (data) {
+          setSign(data.astro_sign);
+          setNotificationsEnabled(!!data.expo_push_token);
+        }
       }
     }
     getProfile();
@@ -174,7 +177,7 @@ const styles = StyleSheet.create({
   infoSection: { marginBottom: 60 },
   infoBlock: {
     backgroundColor: COLORS.surfaceLow,
-    marginBottom: 2,
+    marginBottom: 12,
   },
   settingsSection: {
     marginBottom: 60,
