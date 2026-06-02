@@ -73,11 +73,45 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
         {
           text: "DELETE ACCOUNT",
           style: "destructive",
-          onPress: () =>
-            Alert.alert(
-              "Note",
-              "Account deletion requires an Edge Function to clean up auth.users. To be implemented in phase 2.",
-            ),
+          onPress: async () => {
+            try {
+              if (!session?.user) {
+                Alert.alert("Error", "User not authenticated.");
+                return;
+              }
+              const response = await fetch("https://sfczdfyolkrwgwsfdimz.supabase.co/functions/v1/delete-account", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+              });
+              if (response.ok) {
+                await supabase.auth.signOut();
+                Alert.alert(
+                  "Account Deleted",
+                  "Your account has been successfully deleted.",
+                );
+              }
+              if (!response.ok) {
+                const errorData = await response.json();
+                console.error(
+                  "Response is not ok - error deleting account:",
+                  errorData,
+                );
+                Alert.alert(
+                  "Error",
+                  "An error occurred while deleting your account. Please try again.",
+                );
+              }
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              Alert.alert(
+                "Error",
+                "An error occurred while deleting your account. Please try again.",
+              );
+            }
+          },
         },
       ],
     );
