@@ -7,17 +7,20 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Switch,
 } from "react-native";
 import { supabase } from "../lib/supabase";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { AstroSign } from "../types/database";
 import { setAppIcon } from "../lib/iconManager";
+import { registerForPushNotificationsAsync } from "../lib/notifications";
 
 export const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [selectedSign, setSelectedSign] = useState<AstroSign | null>(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
@@ -34,37 +37,64 @@ export const AuthScreen: React.FC = () => {
 
   async function handleAuth() {
     setLoading(true);
-    if (isSignUp) {
-      const errorMsg = validate();
-      if (errorMsg) {
-        setErrorMessage(errorMsg);
-        return;
-      }
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { astro_sign: selectedSign },
-        },
-      });
+    try {
+      if (isSignUp) {
+        const errorMsg = validate();
+        if (errorMsg) {
+          setErrorMessage(errorMsg);
+          return;
+        }
 
-      if (error) {
-        Alert.alert("Creation Error", error.message);
-      } else {
-        // Changer l'icône de l'app selon le signe zodiacal
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { astro_sign: selectedSign },
+          },
+        });
+
+        if (error) {
+          Alert.alert("Creation Error", error.message);
+          return;
+        }
+
         await setAppIcon(selectedSign);
-        Alert.alert("Success", "Check your emails to confirm your account!");
-      }
-    }
-    if (!isSignUp) {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
 
-      if (error) {
-        Alert.alert("Login Error", error.message);
+        if (notificationsEnabled && data.user?.id) {
+          const token = await registerForPushNotificationsAsync();
+          if (!token) {
+            Alert.alert(
+              "Error",
+              "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
+            );
+          } else {
+            const { error: pushTokenError } = await supabase
+              .from("profiles")
+              .update({ expo_push_token: token })
+              .eq("id", data.user.id);
+
+            if (pushTokenError) {
+              console.error("Error enabling notifications:", pushTokenError);
+              Alert.alert(
+                "Error",
+                "An error occurred while updating your notification settings. Please try again.",
+              );
+            }
+          }
+        }
+
+        Alert.alert("Success", "Check your emails to confirm your account!");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          Alert.alert("Login Error", error.message);
+        }
       }
+    } finally {
       setLoading(false);
     }
   }
@@ -174,6 +204,22 @@ export const AuthScreen: React.FC = () => {
               );
             })}
           </View>
+
+          <View style={styles.notificationRow}>
+            <View style={styles.notificationTextBlock}>
+              <Text style={styles.inputLabel}>ENABLE_NOTIFICATIONS</Text>
+              <Text style={styles.notificationDescription}>
+                Receive your daily roast when the stars are ready.
+              </Text>
+            </View>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={setNotificationsEnabled}
+              trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
+              thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
+              ios_backgroundColor={COLORS.surfaceLow}
+            />
+          </View>
         </>
       )}
       {errorMessage && (
@@ -251,6 +297,22 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
     marginBottom: 40,
+  },
+  notificationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+    marginBottom: 40,
+  },
+  notificationTextBlock: {
+    flex: 1,
+  },
+  notificationDescription: {
+    color: "#666",
+    fontSize: 12,
+    letterSpacing: 0.5,
+    lineHeight: 18,
   },
   chip: {
     backgroundColor: COLORS.surfaceHigh,
