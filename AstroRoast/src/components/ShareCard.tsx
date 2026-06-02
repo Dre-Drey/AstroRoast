@@ -5,6 +5,7 @@ import { Flame } from "lucide-react-native";
 import { COLORS } from "../constants/theme";
 import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 const { width } = Dimensions.get("window");
+import { Image } from "expo-image";
 
 type ShareCardProps = {
   sign: string;
@@ -33,21 +34,47 @@ export default function ShareCard({
         opacity={0.3}
         style={styles.flameBackground}
       />
-      <View style={styles.header}>
-        <Text style={styles.appTitle}>DAILY ROAST</Text>
-        <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
-        <Text style={styles.signTitle}>{sign.toUpperCase()}</Text>
-      </View>
-      <View style={styles.mainContent}>
-        <Text style={styles.hookText}>{hook}</Text>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <View style={styles.header}>
+          <Text style={styles.appTitle}>DAILY ROAST</Text>
+          <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
+          <Text style={styles.signTitle}>{sign.toUpperCase()}</Text>
+        </View>
+        <View style={styles.mainContent}>
+          <Text style={styles.hookText}>{hook}</Text>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        <Text style={styles.mainRoast}>{renderInlineMarkdown(roast)}</Text>
-      </View>
-      <View style={styles.adviceBox}>
-        <Text style={{ color: signColor }}>COSMIC_ADVICE</Text>
-        <Text style={styles.adviceText}>{advice}</Text>
+          <Text style={styles.mainRoast}>{renderInlineMarkdown(roast)}</Text>
+        </View>
+        <View style={styles.adviceBox}>
+          <Text style={{ color: signColor }}>COSMIC_ADVICE</Text>
+          <Text style={styles.adviceText}>{advice}</Text>
+        </View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 12,
+          }}
+        >
+          <Text style={styles.dateText}>Made by </Text>
+          <Image
+            source={require("../../assets/icon.png")}
+            style={{ width: 20, height: 20, marginHorizontal: 2 }}
+          />
+          <Text style={{ fontWeight: "600" }}>Astro Roast </Text>
+          <Text style={styles.dateText}>with love</Text>
+        </View>
       </View>
     </View>
   );
@@ -57,7 +84,7 @@ const styles = StyleSheet.create({
   card: {
     width: width * 0.9,
     aspectRatio: 9 / 16,
-    padding: 30,
+    padding: 28,
     overflow: "hidden",
     elevation: 10,
     shadowColor: "#000",
@@ -76,7 +103,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "flex-start",
-    marginBottom: 20,
+    // marginBottom: 20,
     zIndex: 1,
   },
   appTitle: {
@@ -88,7 +115,7 @@ const styles = StyleSheet.create({
   },
   signTitle: {
     color: COLORS.void,
-    fontSize: 50,
+    fontSize: 48,
     fontWeight: "400",
     marginTop: 5,
   },
@@ -96,7 +123,7 @@ const styles = StyleSheet.create({
     color: COLORS.void,
     fontSize: 12,
     fontWeight: "400",
-    marginTop: 4,
+    // marginTop: 4,
     opacity: 0.7,
   },
   mainContent: {
@@ -107,7 +134,7 @@ const styles = StyleSheet.create({
   },
   hookText: {
     color: COLORS.void,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "700",
     textAlign: "left",
     fontStyle: "italic",
@@ -122,13 +149,12 @@ const styles = StyleSheet.create({
   },
   mainRoast: {
     color: COLORS.void,
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 24,
     textAlign: "left",
     fontWeight: "500",
   },
   adviceBox: {
-    marginTop: 25,
     padding: 12,
     backgroundColor: COLORS.void,
     width: "100%",

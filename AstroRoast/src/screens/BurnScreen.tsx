@@ -20,7 +20,7 @@ import ShareCard from "../components/ShareCard";
 import { useAuth } from "../contexts/AuthContext";
 import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 
-export const BurnScreen: React.FC<BurnScreenProps> = () => {
+export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();
   const cardRef = useRef(null);
   const notificationEnabled = false; // Placeholder for notification toggle state
@@ -200,10 +200,11 @@ export const BurnScreen: React.FC<BurnScreenProps> = () => {
                 SEE HOW YOUR FRIENDS ARE SUFFERING
               </Text>
             </TouchableOpacity> */}
+            {/* Redirect to profile screen */}
             {!notificationEnabled && (
               <TouchableOpacity
                 style={{ marginTop: 10 }}
-                onPress={() => alert("Feature coming soon!")}
+                onPress={() => navigation.navigate("Profile")}
               >
                 <Text
                   style={[
