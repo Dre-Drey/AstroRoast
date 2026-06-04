@@ -5,9 +5,9 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   Alert,
   Switch,
+  Linking,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { supabase } from "../lib/supabase";
@@ -22,6 +22,7 @@ export const AuthScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [selectedSign, setSelectedSign] = useState<AstroSign | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
@@ -33,7 +34,22 @@ export const AuthScreen: React.FC = () => {
       return "The password must be at least 10 characters long.";
     if (password !== confirmPassword) return "The passwords do not match.";
     if (!selectedSign) return "Choose a sign, don't be afraid.";
+    if (!termsAccepted)
+      return "Please accept the terms and conditions before signing up.";
     return null;
+  };
+
+  const openTerms = async (url: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert("Link unavailable", url);
+      }
+    } catch {
+      Alert.alert("Link unavailable", url);
+    }
   };
 
   async function handleAuth() {
@@ -227,6 +243,45 @@ export const AuthScreen: React.FC = () => {
               ios_backgroundColor={COLORS.surfaceLow}
             />
           </View>
+
+          <TouchableOpacity
+            onPress={() => setTermsAccepted((value) => !value)}
+            style={styles.termsRow}
+            activeOpacity={0.8}
+          >
+            <View
+              style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}
+            >
+              {termsAccepted && <Text style={styles.checkboxMark}>✓</Text>}
+            </View>
+            <View style={styles.termsTextBlock}>
+              <Text style={styles.inputLabel}>
+                I accept the{" "}
+                <Text
+                  style={styles.termsLink}
+                  onPress={() =>
+                    openTerms(
+                      "https://app.notion.com/p/Conditions-g-n-rales-d-utilisation-375480e3f16c8047b2b7ca2cad6969b8",
+                    )
+                  }
+                >
+                  general terms of use
+                </Text>{" "}
+                and the{" "}
+                <Text
+                  style={styles.termsLink}
+                  onPress={() =>
+                    openTerms(
+                      "https://app.notion.com/p/Politique-de-confidentialit-375480e3f16c8067a3a6ddca2a2e5de0",
+                    )
+                  }
+                >
+                  privacy policy
+                </Text>
+                .
+              </Text>
+            </View>
+          </TouchableOpacity>
         </>
       )}
       {errorMessage && (
@@ -314,6 +369,39 @@ const styles = StyleSheet.create({
   },
   notificationTextBlock: {
     flex: 1,
+  },
+  termsRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 40,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+  },
+  checkboxChecked: {
+    backgroundColor: COLORS.primary,
+  },
+  checkboxMark: {
+    color: COLORS.void,
+    fontSize: 14,
+    fontWeight: "900",
+    lineHeight: 16,
+  },
+  termsTextBlock: {
+    flex: 1,
+    color: COLORS.primary,
+  },
+  termsLink: {
+    color: COLORS.primary,
+    textDecorationLine: "underline",
+    fontWeight: "700",
   },
   notificationDescription: {
     color: "#666",
