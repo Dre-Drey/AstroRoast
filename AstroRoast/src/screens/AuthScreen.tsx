@@ -9,6 +9,7 @@ import {
   Alert,
   Switch,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { supabase } from "../lib/supabase";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { AstroSign } from "../types/database";
@@ -100,7 +101,13 @@ export const AuthScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <KeyboardAwareScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+      extraScrollHeight={30}
+      enableOnAndroid={true}
+    >
       <View style={styles.title}>
         <Text style={styles.displayMd}>ASTRO ROAST</Text>
       </View>
@@ -234,7 +241,7 @@ export const AuthScreen: React.FC = () => {
           {loading ? "PREPARING THE SALT..." : "GET ROASTED"}
         </Text>
       </TouchableOpacity>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

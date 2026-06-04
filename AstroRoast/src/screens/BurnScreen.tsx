@@ -126,9 +126,8 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
         />
         <Flame
           size={450}
-          fill={COLORS.surfaceHigh}
-          stroke={COLORS.surfaceHigh}
-          opacity={0.8}
+          fill={COLORS.surfaceLow}
+          stroke={COLORS.surfaceLow}
           style={styles.flameBackground}
         />
         <ScrollView

@@ -31,6 +31,7 @@ export default function ShareCard({
       <Flame
         size={380}
         fill="#1a1c1c"
+        stroke={signColor}
         opacity={0.3}
         style={styles.flameBackground}
       />
