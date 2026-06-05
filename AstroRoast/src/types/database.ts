@@ -27,3 +27,14 @@ export type DailyRoast = {
   advice: string;
   event_id: number;
 };
+
+export type RoastReport = {
+  id?: string;
+  user_id: string;
+  roast_sign: AstroSign;
+  roast_date: string;
+  roast_hook: string;
+  roast_content: string;
+  message: string;
+  created_at?: string;
+};

@@ -40,3 +40,34 @@ export const fetchCosmicEvent = async () => {
 
   return data;
 };
+
+type RoastReportInput = {
+  roast: DailyRoast;
+  message: string;
+};
+
+export const submitRoastReport = async ({
+  roast,
+  message,
+}: RoastReportInput): Promise<void> => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const { error } = await supabase.from("roast_reports").insert({
+    user_id: user.id,
+    roast_sign: roast.sign,
+    roast_date: roast.date,
+    roast_hook: roast.hook,
+    roast_content: roast.content,
+    message: message.trim(),
+  });
+
+  if (error) {
+    throw error;
+  }
+};

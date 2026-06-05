@@ -19,6 +19,7 @@ import { BurnScreenProps } from "../types/navigation";
 import ShareCard from "../components/ShareCard";
 import { useAuth } from "../contexts/AuthContext";
 import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
+import DisclaimerForm from "../components/DisclaimerForm";
 
 export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();
@@ -177,7 +178,6 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
             </Text>
             <Text style={styles.adviceText}>{data?.advice}</Text>
           </View>
-
           <View style={styles.ctaContainer}>
             <TouchableOpacity
               style={[styles.secondaryButton, { backgroundColor: signColor }]}
@@ -185,20 +185,6 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
             >
               <Text style={styles.secondaryButtonText}>SHARE THIS ROAST</Text>
             </TouchableOpacity>
-            {/* <TouchableOpacity
-              style={[
-                styles.secondaryButton,
-                {
-                  marginTop: 10,
-                  backgroundColor: COLORS.void,
-                  borderColor: signColor,
-                },
-              ]}
-            >
-              <Text style={[styles.secondaryButtonText, { color: signColor }]}>
-                SEE HOW YOUR FRIENDS ARE SUFFERING
-              </Text>
-            </TouchableOpacity> */}
             {/* Redirect to profile screen */}
             {!notificationEnabled && (
               <TouchableOpacity
@@ -220,6 +206,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             )}
           </View>
+          <DisclaimerForm data={data} />
         </ScrollView>
       </View>
       {/* Share Card is rendered in the DOM but is hidden, it will be captured
