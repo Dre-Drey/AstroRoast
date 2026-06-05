@@ -20,6 +20,7 @@ import ShareCard from "../components/ShareCard";
 import { useAuth } from "../contexts/AuthContext";
 import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 import DisclaimerForm from "../components/DisclaimerForm";
+import { log } from "../lib/log";
 
 export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();
@@ -105,7 +106,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
         UTI: "public.png", // for iOS
       });
     } catch (error) {
-      console.error("Error sharing the card:", error);
+      log.error("Error sharing the card:", error);
       alert("Oups, something wrong happened :( Try again later.");
     }
   };

@@ -44,7 +44,7 @@ export async function setAppIcon(sign: AstroSign | null): Promise<void> {
 
   const iconName = ZODIAC_ICON_NAMES[sign];
   if (!iconName) {
-    console.warn(`No icon found for sign: ${sign}`);
+    log.log(`No icon found for sign: ${sign}`);
     return;
   }
 
@@ -98,9 +98,6 @@ export async function initializeIconManager(): Promise<void> {
       await _updateAppIcon(currentIcon);
     }
   } catch (error) {
-    log.error(
-      "Error occurred while initializing the icon manager:",
-      error,
-    );
+    log.error("Error occurred while initializing the icon manager:", error);
   }
 }

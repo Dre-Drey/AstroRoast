@@ -13,6 +13,7 @@ import { supabase } from "../lib/supabase";
 import { ProfileScreenProps } from "../types/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { registerForPushNotificationsAsync } from "../lib/notifications";
+import { log } from "../lib/log";
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   const { session, signOut, loading } = useAuth();
@@ -37,7 +38,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
           .single();
 
         if (error) {
-          console.error("Error fetching profile:", error);
+          log.error("Error fetching profile:", error);
           Alert.alert(
             "Error",
             "An error occurred while fetching your profile information.",
@@ -60,7 +61,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
     try {
       await signOut();
     } catch (error) {
-      console.error("Erreur lors de la déconnexion:", error);
+      log.error("Erreur lors de la déconnexion:", error);
     }
   };
 
@@ -95,7 +96,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
               }
               if (!response.ok) {
                 const errorData = await response.json();
-                console.error(
+                log.error(
                   "Response is not ok - error deleting account:",
                   errorData,
                 );
@@ -105,7 +106,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
                 );
               }
             } catch (error) {
-              console.error("Error deleting account:", error);
+              log.error("Error deleting account:", error);
               Alert.alert(
                 "Error",
                 "An error occurred while deleting your account. Please try again.",
@@ -141,7 +142,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
           .eq("id", session.user.id);
 
         if (error) {
-          console.error("Error enabling notifications:", error);
+          log.error("Error enabling notifications:", error);
           throw new Error("Failed to enable notifications");
         }
         setNotificationsEnabled(true);
@@ -153,7 +154,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
           .eq("id", session.user.id);
 
         if (error) {
-          console.error("Error disabling notifications:", error);
+          log.error("Error disabling notifications:", error);
           throw new Error("Failed to disable notifications");
         }
         setNotificationsEnabled(false);

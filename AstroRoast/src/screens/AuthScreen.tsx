@@ -15,6 +15,7 @@ import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { AstroSign } from "../types/database";
 import { setAppIcon } from "../lib/iconManager";
 import { registerForPushNotificationsAsync } from "../lib/notifications";
+import { log } from "../lib/log";
 
 export const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -91,7 +92,7 @@ export const AuthScreen: React.FC = () => {
               .eq("id", data.user.id);
 
             if (pushTokenError) {
-              console.error("Error enabling notifications:", pushTokenError);
+              log.error("Error enabling notifications:", pushTokenError);
               Alert.alert(
                 "Error",
                 "An error occurred while updating your notification settings. Please try again.",
