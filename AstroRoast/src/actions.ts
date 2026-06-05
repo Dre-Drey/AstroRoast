@@ -1,5 +1,6 @@
 import { supabase } from "./lib/supabase";
 import { DailyRoast } from "./types/database";
+import { log } from "./lib/log"
 
 export const fetchDailyRoast = async (): Promise<DailyRoast> => {
   const {
@@ -17,7 +18,7 @@ export const fetchDailyRoast = async (): Promise<DailyRoast> => {
   const today = new Date().toISOString().split("T")[0];
   const { data, error } = await supabase
     .from("daily_roasts")
-    .select("sign, hook, advice, content")
+    .select("id, sign, hook, advice, content")
     .eq("sign", profile.astro_sign)
     .eq("date", today);
 
@@ -34,7 +35,7 @@ export const fetchCosmicEvent = async () => {
     .single();
 
   if (error) {
-    console.error("Error fetching cosmic event:", error);
+    log.error("Error fetching cosmic event:", error);
     return null;
   }
 
@@ -60,10 +61,7 @@ export const submitRoastReport = async ({
 
   const { error } = await supabase.from("roast_reports").insert({
     user_id: user.id,
-    roast_sign: roast.sign,
-    roast_date: roast.date,
-    roast_hook: roast.hook,
-    roast_content: roast.content,
+    roast_id: roast.id,
     message: message.trim(),
   });
 

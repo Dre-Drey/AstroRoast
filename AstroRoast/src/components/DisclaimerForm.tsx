@@ -10,6 +10,7 @@ import {
 import { COLORS } from "../constants/theme";
 import { submitRoastReport } from "../actions";
 import type { DailyRoast } from "../types/database";
+import { log } from "../lib/log";
 
 export default function DisclaimerForm({
   data,
@@ -44,7 +45,7 @@ export default function DisclaimerForm({
         "Thanks. We linked your message to this roast and saved it for review.",
       );
     } catch (reportError) {
-      console.error("Error submitting roast report:", reportError);
+      log.error("Error submitting roast report:", reportError);
       Alert.alert("Could not send report", "Please try again in a moment.");
     } finally {
       setReportSubmitting(false);

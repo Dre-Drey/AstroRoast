@@ -20,6 +20,7 @@ export interface Profile {
 }
 
 export type DailyRoast = {
+  id: string;
   sign: AstroSign;
   date: string; // ISO format date (YYYY-MM-DD)
   hook: string;
@@ -31,10 +32,7 @@ export type DailyRoast = {
 export type RoastReport = {
   id?: string;
   user_id: string;
-  roast_sign: AstroSign;
-  roast_date: string;
-  roast_hook: string;
-  roast_content: string;
+  roast_id: string;
   message: string;
   created_at?: string;
 };
