@@ -3,6 +3,7 @@
     "name": "AstroRoast",
     "slug": "astroroast",
     "version": "1.0.0",
+    "scheme": "astroroast",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,6 +14,9 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "supportsTablet": true,
       "bundleIdentifier": "com.astroroast.app",
       "alternateIcons": {
@@ -74,6 +78,13 @@
           "color": "#ffffff",
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": false
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Allow AstroRoast to access your Face ID biometric data."
         }
       ]
     ]

@@ -2,6 +2,7 @@ import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { supabase } from "./supabase";
+import { log } from "./log";
 
 export async function registerForPushNotificationsAsync() {
   let token;
@@ -41,7 +42,7 @@ export async function registerForPushNotificationsAsync() {
       })
     ).data;
   } catch (e) {
-    console.log(e);
+    log.log(e);
     token = null;
   }
 
@@ -60,9 +61,9 @@ export const syncPushToken = async (userId: string) => {
       .eq("id", userId);
 
     if (error) {
-      console.error("Erreur lors de la synchronisation du token push:", error);
+      log.error("Error syncing push token:", error);
     }
   } catch (err) {
-    console.error("Échec de l'enregistrement des notifications:", err);
+    log.error("Error occurred while registering for push notifications:", err);
   }
 };

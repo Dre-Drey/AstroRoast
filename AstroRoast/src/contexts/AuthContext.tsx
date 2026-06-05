@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
-import { setAppIcon } from "../lib/iconManager";
 import { initializeIconManager } from "../lib/iconManager";
 import {
-  registerForPushNotificationsAsync,
   syncPushToken,
 } from "../lib/notifications";
 
@@ -36,6 +34,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setSession(session);
         setLoading(false);
+        // If a session exists, sync the push token with the backend
+        if (session?.user) {
+          syncPushToken(session.user.id);
+        }
       })
       .catch(() => {
         if (!isMounted) {
@@ -44,10 +46,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         setSession(null);
         setLoading(false);
-        // If a session exists, sync the push token with the backend
-        if (session?.user) {
-          syncPushToken(session.user.id);
-        }
       });
 
     const {

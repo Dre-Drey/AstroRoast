@@ -1,16 +1,17 @@
-import { Platform, Alert, NativeModules } from "react-native";
+import { NativeModules } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AstroSign } from "../types/database";
+import { log } from "./log";
 
-// Obtenir le module natif IconManager
+// Retrieve native module or provide a fallback
 const IconManagerModule = NativeModules.IconManager || {
   setIcon: async () => {
-    console.warn("IconManager module non disponible");
+    log.log("IconManager module not available");
   },
   getCurrentIcon: async () => "default",
 };
 
-// Mapping des icônes par signe zodiacal
+// Mapping zodiac signs to icon names
 const ZODIAC_ICON_NAMES: Record<AstroSign, string> = {
   Aries: "aries",
   Taurus: "taurus",
@@ -30,12 +31,12 @@ const STORAGE_KEY = "app_icon_sign";
 const DEFAULT_ICON_NAME = "default";
 
 /**
- * Définit l'icône de l'application en fonction du signe zodiacal
- * @param sign - Le signe zodiacal sélectionné
+ * Define app icon based on the user's zodiac sign
+ * @param sign - The selected zodiac sign
  */
 export async function setAppIcon(sign: AstroSign | null): Promise<void> {
   if (!sign) {
-    // Réinitialiser à l'icône par défaut
+    // Reset to the default icon
     await _updateAppIcon(null);
     await AsyncStorage.setItem(STORAGE_KEY, DEFAULT_ICON_NAME);
     return;
@@ -43,64 +44,62 @@ export async function setAppIcon(sign: AstroSign | null): Promise<void> {
 
   const iconName = ZODIAC_ICON_NAMES[sign];
   if (!iconName) {
-    console.warn(`Aucune icône trouvée pour le signe: ${sign}`);
+    console.warn(`No icon found for sign: ${sign}`);
     return;
   }
 
   try {
     await _updateAppIcon(iconName);
     await AsyncStorage.setItem(STORAGE_KEY, iconName);
-    console.log(`✓ Icon set to: ${iconName}`);
+    log.log(`✓ Icon set to: ${iconName}`);
   } catch (error) {
-    console.error("Erreur lors de la modification de l'icône:", error);
-    // Ne pas afficher d'alerte pour éviter d'interrompre l'UX
+    log.error("Error occurred while updating the app icon:", error);
+    // Do not display an alert to avoid interrupting the UX
   }
 }
 
 /**
- * Récupère l'icône actuellement définie
+ * Retrieve the current app icon from storage or native module
  */
 export async function getCurrentIcon(): Promise<string> {
   try {
     const stored = await AsyncStorage.getItem(STORAGE_KEY);
     return stored || DEFAULT_ICON_NAME;
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'icône:", error);
+    log.error("Error occurred while retrieving the app icon:", error);
     return DEFAULT_ICON_NAME;
   }
 }
 
 /**
- * Appelle le code natif pour changer l'icône
+ * Call the native module to update the app icon, with error handling
  */
 async function _updateAppIcon(iconName: string | null): Promise<void> {
   try {
     if (!IconManagerModule.setIcon) {
-      console.log("Module IconManager non disponible - icônes ignorées");
+      log.log("Module IconManager not available - icons ignored");
       return;
     }
 
-    // Appeler le module natif directement
     await IconManagerModule.setIcon(iconName);
   } catch (error) {
-    console.error("Erreur lors de l'appel au module natif:", error);
-    // L'erreur est silencieuse pour l'utilisateur
+    log.error("Error occurred while calling the native module:", error);
   }
 }
 
 /**
- * Initialise le gestionnaire d'icônes au démarrage de l'app
+ * Initialise the icon manager at app startup
  */
 export async function initializeIconManager(): Promise<void> {
   try {
     const currentIcon = await getCurrentIcon();
     if (currentIcon && currentIcon !== DEFAULT_ICON_NAME) {
-      // Restaurer l'icône au démarrage
+      // Restore the icon at startup
       await _updateAppIcon(currentIcon);
     }
   } catch (error) {
-    console.error(
-      "Erreur lors de l'initialisation du gestionnaire d'icônes:",
+    log.error(
+      "Error occurred while initializing the icon manager:",
       error,
     );
   }

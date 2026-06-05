@@ -1,8 +1,13 @@
 import { AppState, Platform } from "react-native";
 import "react-native-url-polyfill/auto";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient, processLock } from "@supabase/supabase-js";
+import * as SecureStore from 'expo-secure-store';
 
+const ExpoSecureStoreAdapter = {
+  getItem: (key: string) => SecureStore.getItemAsync(key),
+  setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
+  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+};
 function requireEnv(name: string, value: string | undefined): string {
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
@@ -22,7 +27,7 @@ const supabasePublishableKey = requireEnv(
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
-    ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
+    ...(Platform.OS !== "web" ? { storage: ExpoSecureStoreAdapter } : {}),
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
