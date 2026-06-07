@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -18,44 +18,63 @@ import { log } from "../lib/log";
 export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   const { session, signOut, loading } = useAuth();
   const [dataLoading, setDataLoading] = useState(true);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const [updatingNotifications, setUpdatingNotifications] = useState(false);
 
   const [email, setEmail] = useState<string | undefined>("");
   const [sign, setSign] = useState<string>("");
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
-  useEffect(() => {
-    async function getProfile() {
+  const loadProfile = useCallback(async () => {
+    setDataLoading(true);
+    setProfileError(null);
+
+    try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (user) {
-        setEmail(user.email);
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("astro_sign, expo_push_token")
-          .eq("id", user.id)
-          .single();
-
-        if (error) {
-          log.error("Error fetching profile:", error);
-          Alert.alert(
-            "Error",
-            "An error occurred while fetching your profile information.",
-          );
-          setDataLoading(false);
-          return;
-        }
-
-        if (data) {
-          setSign(data.astro_sign);
-          setNotificationsEnabled(!!data.expo_push_token);
-          setDataLoading(false);
-        }
+      if (!user) {
+        return;
       }
+
+      setEmail(user.email);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("astro_sign, expo_push_token")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        log.error("Error fetching profile:", error);
+        setProfileError(
+          "We could not load your profile right now. Check your connection and tap Retry.",
+        );
+        return;
+      }
+
+      if (data) {
+        setSign(data.astro_sign);
+        setNotificationsEnabled(!!data.expo_push_token);
+      }
+    } catch (error) {
+      log.error("Error fetching profile:", error);
+      setProfileError(
+        "We could not load your profile right now. Check your connection and tap Retry.",
+      );
+    } finally {
+      setDataLoading(false);
     }
-    getProfile();
-  }, [session]);
+  }, []);
+
+  useEffect(() => {
+    if (!session) {
+      setDataLoading(false);
+      setProfileError(null);
+      return;
+    }
+
+    void loadProfile();
+  }, [session, loadProfile]);
 
   const handleSignOut = async () => {
     try {
@@ -182,7 +201,22 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
 
   return (
     <View style={styles.container}>
-      {session ? (
+      {profileError ? (
+        <View style={styles.center}>
+          <Text style={styles.displayMd}>PROFILE OFFLINE</Text>
+          <Text style={[styles.labelMd, styles.errorMessage]}>
+            {profileError}
+          </Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => {
+              void loadProfile();
+            }}
+          >
+            <Text style={styles.retryButtonText}>RETRY</Text>
+          </TouchableOpacity>
+        </View>
+      ) : session ? (
         <>
           <View style={styles.header}>
             <Text style={styles.displayMd}>PROFIL</Text>
@@ -269,6 +303,11 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     fontWeight: "700",
   },
+  errorMessage: {
+    textAlign: "center",
+    lineHeight: 20,
+    marginTop: 16,
+  },
   labelSm: {
     color: COLORS.primary,
     fontSize: 10,
@@ -326,5 +365,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     textDecorationLine: "underline",
+  },
+  retryButton: {
+    marginTop: 18,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  retryButtonText: {
+    color: COLORS.primary,
+    fontWeight: "900",
+    fontSize: 12,
+    letterSpacing: 1,
   },
 });

@@ -72,7 +72,11 @@ export const AuthScreen: React.FC = () => {
         });
 
         if (error) {
-          Alert.alert("Creation Error", error.message);
+          log.error("Error creating account:", error);
+          Alert.alert(
+            "Creation Error",
+            "We could not create your account right now. Check your connection and try again.",
+          );
           return;
         }
 
@@ -109,7 +113,11 @@ export const AuthScreen: React.FC = () => {
         });
 
         if (error) {
-          Alert.alert("Login Error", error.message);
+          log.error("Error logging in:", error);
+          Alert.alert(
+            "Login Error",
+            "We could not log you in right now. Check your connection and try again.",
+          );
         }
       }
     } finally {

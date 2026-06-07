@@ -29,6 +29,13 @@ export type DailyRoast = {
   event_id: number;
 };
 
+export type CosmicEvent = {
+  id?: string | number;
+  date: string;
+  type: string;
+  evenement: string;
+};
+
 export type RoastReport = {
   id?: string;
   user_id: string;

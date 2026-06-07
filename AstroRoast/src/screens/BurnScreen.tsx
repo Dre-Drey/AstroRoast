@@ -26,7 +26,13 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();
   const cardRef = useRef(null);
   const notificationEnabled = false; // Placeholder for notification toggle state
-  const { data, isLoading, isError, error } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch: refetchDailyRoast,
+  } = useQuery({
     queryKey: ["dailyRoast"],
     queryFn: () => fetchDailyRoast(),
     retry: 1,
@@ -37,6 +43,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
     isLoading: isCosmicEventLoading,
     isError: isCosmicEventError,
     error: cosmicEventError,
+    refetch: refetchCosmicEvent,
   } = useQuery({
     queryKey: ["cosmicEvent"],
     queryFn: () => fetchCosmicEvent(),
@@ -65,10 +72,19 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   if (isError) {
     return (
       <View style={styles.center}>
-        <Text style={styles.displayMd}>ERROR</Text>
+        <Text style={styles.displayMd}>ROAST UNAVAILABLE</Text>
         <Text style={styles.errorText}>
-          [ {(error as Error).message.toUpperCase()} ]
+          {(error as Error).message ||
+            "We could not load today’s roast right now."}
         </Text>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={() => {
+            void refetchDailyRoast();
+          }}
+        >
+          <Text style={styles.retryButtonText}>RETRY</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -149,16 +165,35 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
           <View style={styles.dataGrid}>
             <Text style={styles.date}>Cosmic event of the day </Text>
             <View style={styles.dataBlock}>
-              {isCosmicEventLoading ||
-                (isCosmicEventError && (
-                  <Text style={styles.dataValue}>No cosmic event today</Text>
-                ))}
-              <Text style={[styles.dataValue]}>
-                <Text style={{ textTransform: "capitalize" }}>
-                  {cosmicEventData?.type}:
-                </Text>{" "}
-                {cosmicEventData?.evenement}
-              </Text>
+              {isCosmicEventLoading ? (
+                <Text style={styles.dataValue}>Loading cosmic event...</Text>
+              ) : isCosmicEventError ? (
+                <>
+                  <Text style={styles.dataValue}>
+                    Cosmic event unavailable right now.
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.retryLink}
+                    onPress={() => {
+                      void refetchCosmicEvent();
+                    }}
+                  >
+                    <Text style={styles.retryLinkText}>RETRY EVENT</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.errorText}>
+                    {(cosmicEventError as Error).message}
+                  </Text>
+                </>
+              ) : cosmicEventData ? (
+                <Text style={styles.dataValue}>
+                  <Text style={{ textTransform: "capitalize" }}>
+                    {cosmicEventData.type}:
+                  </Text>{" "}
+                  {cosmicEventData.evenement}
+                </Text>
+              ) : (
+                <Text style={styles.dataValue}>No cosmic event today</Text>
+              )}
             </View>
           </View>
 
@@ -250,6 +285,33 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     marginTop: 10,
+    lineHeight: 18,
+  },
+  retryButton: {
+    marginTop: 18,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  retryButtonText: {
+    color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: "900",
+    letterSpacing: 1,
+  },
+  retryLink: {
+    marginTop: 10,
+    alignSelf: "flex-start",
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.primary,
+    paddingBottom: 2,
+  },
+  retryLinkText: {
+    color: COLORS.primary,
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 1,
   },
   container: { flex: 1 },
   content: { padding: 20, paddingBottom: 120 },

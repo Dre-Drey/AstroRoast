@@ -46,7 +46,10 @@ export default function DisclaimerForm({
       );
     } catch (reportError) {
       log.error("Error submitting roast report:", reportError);
-      Alert.alert("Could not send report", "Please try again in a moment.");
+      Alert.alert(
+        "Could not send report",
+        "We could not send your report right now. Check your connection and try again.",
+      );
     } finally {
       setReportSubmitting(false);
     }
