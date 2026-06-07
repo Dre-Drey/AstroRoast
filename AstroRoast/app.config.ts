@@ -61,8 +61,8 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
     package: "com.astroroast.app",
     versionCode: 1,
     adaptiveIcon: {
-      foregroundImage: "./assets/icons/adaptive-icon.png",
-      backgroundColor: "#0e0e0e",
+      foregroundImage: "./assets/icons/android/adaptive-foreground.png",
+      backgroundImage: "./assets/icons/android/adaptive-background.png",
     },
     edgeToEdgeEnabled: true,
     permissions: [
