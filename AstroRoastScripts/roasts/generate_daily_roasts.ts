@@ -48,7 +48,7 @@ function trimRoastContent(
   maxLength = 400,
   minSentenceEnd = 300,
 ): string {
-  const trimmed = content.trim();
+  const trimmed = content.replace(/\s*—\s*/g, ", ").trim();
 
   if (trimmed.length <= maxLength) {
     return trimmed;
@@ -226,10 +226,8 @@ async function upsertRoasts(
 
 // MAIN FUNCTION
 async function generateWeeklyRoasts(): Promise<void> {
-  const NUMBER_OF_DAYS = 2; // adjust as needed
-  const startDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0];
+  const NUMBER_OF_DAYS = 1; // adjust as needed
+  const startDate = new Date().toISOString().split("T")[0];
 
   const { data: events, error } = await supabase
     .from("cosmic_events")

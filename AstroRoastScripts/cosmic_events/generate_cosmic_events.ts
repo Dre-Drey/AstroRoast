@@ -211,8 +211,6 @@ async function run() {
         date: day.toISOString().split("T")[0],
         ...event,
       });
-      // console.log(day);
-      // console.table(event);
     }
 
     if (!event) {
