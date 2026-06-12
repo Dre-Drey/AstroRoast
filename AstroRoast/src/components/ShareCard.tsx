@@ -70,7 +70,7 @@ export default function ShareCard({
         >
           <Text style={styles.dateText}>Made by </Text>
           <Image
-            source={require("../../assets/icon.png")}
+            source={require("../../assets/icons/icon.png")}
             style={{ width: 20, height: 20, marginHorizontal: 2 }}
           />
           <Text style={{ fontWeight: "600" }}>Astro Roast </Text>

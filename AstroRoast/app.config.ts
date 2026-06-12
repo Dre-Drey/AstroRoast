@@ -98,10 +98,9 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
 
   description:
     "Discover your daily horoscope with a roast twist. The stars don't guide you, they judge you.",
-
   extra: {
     eas: {
-      projectId: "TON_PROJECT_ID_EAS", // todo: à récupérer via : eas init
+      projectId: "b3173a27-bd01-457e-a426-d025cc4e1a6b",
     },
   },
 });
