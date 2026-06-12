@@ -212,6 +212,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
             onPress={() => {
               void loadProfile();
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Retry loading profile"
+            accessibilityHint="Attempts to reload your profile information."
           >
             <Text style={styles.retryButtonText}>RETRY</Text>
           </TouchableOpacity>
@@ -247,6 +250,10 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
                 trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
                 thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
                 ios_backgroundColor={COLORS.surfaceLow}
+                accessibilityLabel="Enable notifications"
+                accessibilityRole="switch"
+                accessibilityState={{ checked: notificationsEnabled }}
+                accessibilityHint="Turns profile notifications on or off."
               />
             </View>
           </View>
@@ -255,6 +262,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
             <TouchableOpacity
               style={styles.logoutButton}
               onPress={handleSignOut}
+              accessibilityRole="button"
+              accessibilityLabel="Log out"
+              accessibilityHint="Signs you out of the app."
             >
               <Text style={styles.logoutText}>LOGOUT_SESSION</Text>
             </TouchableOpacity>
@@ -262,6 +272,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={handleDeleteAccount}
+              accessibilityRole="button"
+              accessibilityLabel="Delete account"
+              accessibilityHint="Permanently removes your account."
             >
               <Text style={styles.deleteText}>DELETE_ACCOUNT</Text>
             </TouchableOpacity>
@@ -311,7 +324,7 @@ const styles = StyleSheet.create({
   labelSm: {
     color: COLORS.primary,
     fontSize: 10,
-    opacity: 0.5,
+    opacity: 0.75,
     letterSpacing: 1,
     marginBottom: 4,
   },

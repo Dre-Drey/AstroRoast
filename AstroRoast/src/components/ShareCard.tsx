@@ -27,7 +27,12 @@ export default function ShareCard({
   viewRef,
 }: ShareCardProps) {
   return (
-    <View ref={viewRef} style={[styles.card, { backgroundColor: signColor }]}>
+    <View
+      ref={viewRef}
+      style={[styles.card, { backgroundColor: signColor }]}
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+    >
       <Flame
         size={380}
         fill="#1a1c1c"

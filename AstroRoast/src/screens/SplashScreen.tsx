@@ -8,9 +8,10 @@ export const SplashScreen: React.FC = () => {
     <LinearGradient
       colors={["#0e0e0e", "#161616", "#24160f"]}
       style={styles.container}
+      accessibilityRole="progressbar"
     >
       <View style={styles.glow} />
-      <View style={styles.content}>
+      <View style={styles.content} accessible accessibilityLabel="Loading Astro Roast">
         <Text style={styles.kicker}>ASTRO ROAST</Text>
         <Text style={styles.title}>Reading your stars</Text>
         <Text style={styles.subtitle}>Checking the cosmic alignment...</Text>

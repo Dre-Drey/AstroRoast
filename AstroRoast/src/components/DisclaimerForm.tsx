@@ -67,6 +67,10 @@ export default function DisclaimerForm({
       <TouchableOpacity
         style={styles.reportToggle}
         onPress={() => setReportOpen((current) => !current)}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: reportOpen }}
+        accessibilityLabel={reportOpen ? "Hide report form" : "Flag this roast"}
+        accessibilityHint="Opens a form to report a roast that felt off or inappropriate."
       >
         <Text style={styles.reportToggleText}>
           {reportOpen ? "HIDE REPORT FORM" : "FLAG THIS ROAST"}
@@ -82,11 +86,13 @@ export default function DisclaimerForm({
             value={reportMessage}
             onChangeText={setReportMessage}
             placeholder="Tell us what happened..."
-            placeholderTextColor="#666"
+            placeholderTextColor="#a7a7a7"
             multiline
             textAlignVertical="top"
             style={styles.reportInput}
             maxLength={500}
+            accessibilityLabel="Report message"
+            accessibilityHint="Describe what felt off about this roast. Maximum 500 characters."
           />
           <Text style={styles.reportHint}>
             We store this with the roast date, sign, and content so we can
@@ -96,6 +102,10 @@ export default function DisclaimerForm({
             style={styles.reportButton}
             onPress={() => handleSubmitReport(data)}
             disabled={reportSubmitting}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: reportSubmitting }}
+            accessibilityLabel={reportSubmitting ? "Sending report" : "Send report"}
+            accessibilityHint="Submits your report for review."
           >
             <Text style={styles.reportButtonText}>
               {reportSubmitting ? "SENDING..." : "SEND REPORT"}
@@ -164,7 +174,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   reportHint: {
-    color: "#b7b7b7",
+    color: "#d0d0d0",
     fontSize: 11,
     lineHeight: 16,
     marginTop: 8,

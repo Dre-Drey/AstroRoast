@@ -60,7 +60,11 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
 
   if (isLoading || loading) {
     return (
-      <View style={styles.center}>
+      <View
+        style={styles.center}
+        accessible
+        accessibilityLabel="Loading daily roast"
+      >
         <ActivityIndicator color={COLORS.primary} />
         <Text style={[styles.labelMd, { marginTop: 20 }]}>
           READING_STARS...
@@ -152,6 +156,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
           style={styles.container}
           contentContainerStyle={styles.content}
           bounces={true}
+          accessibilityLabel="Daily roast content"
         >
           <View style={styles.header}>
             <Text style={[styles.displayLg, { color: signColor }]}>
@@ -177,6 +182,9 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
                     onPress={() => {
                       void refetchCosmicEvent();
                     }}
+                    accessibilityRole="button"
+                    accessibilityLabel="Retry cosmic event"
+                    accessibilityHint="Tries loading the cosmic event again."
                   >
                     <Text style={styles.retryLinkText}>RETRY EVENT</Text>
                   </TouchableOpacity>
@@ -218,6 +226,9 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
             <TouchableOpacity
               style={[styles.secondaryButton, { backgroundColor: signColor }]}
               onPress={handleShare}
+              accessibilityRole="button"
+              accessibilityLabel="Share this roast"
+              accessibilityHint="Opens the system share sheet for the daily roast image."
             >
               <Text style={styles.secondaryButtonText}>SHARE THIS ROAST</Text>
             </TouchableOpacity>
@@ -226,6 +237,9 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
               <TouchableOpacity
                 style={{ marginTop: 10 }}
                 onPress={() => navigation.navigate("Profile")}
+                accessibilityRole="button"
+                accessibilityLabel="Enable notifications"
+                accessibilityHint="Opens the profile screen where notifications can be enabled."
               >
                 <Text
                   style={[
@@ -346,7 +360,7 @@ const styles = StyleSheet.create({
   labelSm: {
     color: COLORS.primary,
     fontSize: 10,
-    opacity: 0.6,
+    opacity: 0.75,
     letterSpacing: 1,
   },
   displayLg: { fontSize: 64, fontWeight: "900", letterSpacing: -2 },

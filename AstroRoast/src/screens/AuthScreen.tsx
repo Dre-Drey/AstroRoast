@@ -160,9 +160,31 @@ export const AuthScreen: React.FC = () => {
 
           <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
             <Text style={styles.inputLabel}>
-              {isSignUp
-                ? "Already cursed ? Login here"
-                : "No sign assigned ? Signup here"}
+              {isSignUp ? (
+                <Text style={styles.inputLabel}>
+                  Already cursed ?{" "}
+                  <Text
+                    style={[
+                      styles.inputLabel,
+                      { textDecorationLine: "underline" },
+                    ]}
+                  >
+                    Login here
+                  </Text>
+                </Text>
+              ) : (
+                <Text style={styles.inputLabel}>
+                  No sign assigned ?{" "}
+                  <Text
+                    style={[
+                      styles.inputLabel,
+                      { textDecorationLine: "underline" },
+                    ]}
+                  >
+                    Signup here
+                  </Text>
+                </Text>
+              )}
             </Text>
           </TouchableOpacity>
         </View>
@@ -172,10 +194,15 @@ export const AuthScreen: React.FC = () => {
             onChangeText={setEmail}
             value={email}
             placeholder="email@address.com"
-            placeholderTextColor="#666"
+            placeholderTextColor="#a7a7a7"
             autoCapitalize="none"
             keyboardType="email-address"
+            autoComplete="email"
+            textContentType="emailAddress"
+            returnKeyType="next"
             style={styles.input}
+            accessibilityLabel="Email address"
+            accessibilityHint="Enter the email address for your account."
           />
         </View>
         <View style={styles.inputGroup}>
@@ -185,9 +212,14 @@ export const AuthScreen: React.FC = () => {
             value={password}
             secureTextEntry
             placeholder="Password"
-            placeholderTextColor="#666"
+            placeholderTextColor="#a7a7a7"
             autoCapitalize="none"
+            autoComplete="password"
+            textContentType="password"
+            returnKeyType={isSignUp ? "next" : "done"}
             style={styles.input}
+            accessibilityLabel="Password"
+            accessibilityHint="Enter your account password."
           />
         </View>
         {isSignUp && (
@@ -198,9 +230,14 @@ export const AuthScreen: React.FC = () => {
               value={confirmPassword}
               secureTextEntry
               placeholder="Confirm Password"
-              placeholderTextColor="#666"
+              placeholderTextColor="#a7a7a7"
               autoCapitalize="none"
+              autoComplete="password"
+              textContentType="password"
+              returnKeyType="done"
               style={styles.input}
+              accessibilityLabel="Confirm password"
+              accessibilityHint="Re-enter the same password to confirm it."
             />
           </View>
         )}
@@ -223,6 +260,10 @@ export const AuthScreen: React.FC = () => {
                     styles.chip,
                     isSelected && { backgroundColor: SIGN_COLORS[sign] },
                   ]}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: isSelected }}
+                  accessibilityLabel={sign.toUpperCase()}
+                  accessibilityHint="Selects your astro sign for signup."
                 >
                   <Text
                     style={[
@@ -250,6 +291,10 @@ export const AuthScreen: React.FC = () => {
               trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
               thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
               ios_backgroundColor={COLORS.surfaceLow}
+              accessibilityLabel="Enable notifications"
+              accessibilityRole="switch"
+              accessibilityState={{ checked: notificationsEnabled }}
+              accessibilityHint="Turns daily roast notifications on or off."
             />
           </View>
 
@@ -257,6 +302,10 @@ export const AuthScreen: React.FC = () => {
             onPress={() => setTermsAccepted((value) => !value)}
             style={styles.termsRow}
             activeOpacity={0.8}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: termsAccepted }}
+            accessibilityLabel="Accept the general terms of use and privacy policy"
+            accessibilityHint="Required before signing up. Double tap to toggle."
           >
             <View
               style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}
@@ -273,6 +322,9 @@ export const AuthScreen: React.FC = () => {
                       "https://app.notion.com/p/Conditions-g-n-rales-d-utilisation-375480e3f16c8047b2b7ca2cad6969b8",
                     )
                   }
+                  accessibilityRole="link"
+                  accessibilityLabel="Open general terms of use"
+                  accessibilityHint="Opens the general terms of use in your browser."
                 >
                   general terms of use
                 </Text>{" "}
@@ -284,6 +336,9 @@ export const AuthScreen: React.FC = () => {
                       "https://app.notion.com/p/Politique-de-confidentialit-375480e3f16c8067a3a6ddca2a2e5de0",
                     )
                   }
+                  accessibilityRole="link"
+                  accessibilityLabel="Open privacy policy"
+                  accessibilityHint="Opens the privacy policy in your browser."
                 >
                   privacy policy
                 </Text>
@@ -294,12 +349,22 @@ export const AuthScreen: React.FC = () => {
         </>
       )}
       {errorMessage && (
-        <Text style={{ color: "red", marginTop: 8 }}>{errorMessage}</Text>
+        <Text
+          style={{ color: "#ff6b6b", marginTop: 8 }}
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+        >
+          {errorMessage}
+        </Text>
       )}
       <TouchableOpacity
         style={[styles.button, loading && { opacity: 0.7 }]}
         onPress={handleAuth}
         disabled={loading}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: loading }}
+        accessibilityLabel={loading ? "Preparing the salt" : "Get roasted"}
+        accessibilityHint="Submits the login or signup form."
       >
         <Text style={styles.buttonText}>
           {loading ? "PREPARING THE SALT..." : "GET ROASTED"}
@@ -351,7 +416,7 @@ const styles = StyleSheet.create({
   inputGroup: { marginBottom: 25 },
   inputLabel: {
     color: COLORS.primary,
-    fontSize: 10,
+    fontSize: 12,
     letterSpacing: 1,
     marginBottom: 8,
     fontFamily: "SpaceGrotesk_700Bold", // Si chargée
@@ -413,7 +478,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   notificationDescription: {
-    color: "#666",
+    color: "#c8c8c8",
     fontSize: 12,
     letterSpacing: 0.5,
     lineHeight: 18,
