@@ -1,6 +1,6 @@
 import { supabase } from "./lib/supabase";
 import { CosmicEvent, DailyRoast } from "./types/database";
-import { log } from "./lib/log"
+import { log } from "./lib/log";
 
 const NETWORK_ERROR_MESSAGE =
   "We could not load this content right now. Check your connection and tap Retry.";
