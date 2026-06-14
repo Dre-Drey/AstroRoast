@@ -59,6 +59,7 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
 
   android: {
     package: "com.astroroast.app",
+    googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
     versionCode: 1,
     adaptiveIcon: {
       foregroundImage: "./assets/icons/android/adaptive-foreground.png",
@@ -81,7 +82,7 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
     [
       "expo-notifications",
       {
-        icon: "./assets/icons/icon.png",
+        icon: "./assets/icons/notification-icon.png",
         color: "#0e0e0e",
         defaultChannel: "default",
         enableBackgroundRemoteNotifications: false,

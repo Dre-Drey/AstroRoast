@@ -1,5 +1,9 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
+# Google push notification service files
+astroroast-3eb16-firebase-adminsdk-fbsvc-c3ca7e3a55.json
+google-services.json
+
 # dependencies
 node_modules/
 
