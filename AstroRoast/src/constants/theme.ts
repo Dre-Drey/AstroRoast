@@ -7,16 +7,16 @@ export const COLORS = {
 };
 
 export const SIGN_COLORS: Record<string, string> = {
-  Aries: "#FF562B",
-  Taurus: "#4cd964",
-  Gemini: "#FA3ECE",
-  Cancer: "#81D4FA",
-  Leo: "#FFD60A",
-  Virgo: "#A7F220",
-  Libra: "#F8BBD0",
-  Scorpio: "#EC2828",
-  Sagittarius: "#B552FF",
-  Capricorn: "#2962FF",
-  Aquarius: "#00BDC9",
-  Pisces: "#02D18C",
+  aries: "#FF562B",
+  taurus: "#4cd964",
+  gemini: "#FA3ECE",
+  cancer: "#81D4FA",
+  leo: "#FFD60A",
+  virgo: "#A7F220",
+  libra: "#F8BBD0",
+  scorpio: "#EC2828",
+  sagittarius: "#B552FF",
+  capricorn: "#2962FF",
+  aquarius: "#00BDC9",
+  pisces: "#02D18C",
 };

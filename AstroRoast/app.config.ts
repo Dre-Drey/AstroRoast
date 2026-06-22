@@ -26,7 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
   },
 
   ios: {
-    bundleIdentifier: "com.astroroast.app",
+    bundleIdentifier: "com.dredrey.astroroast",
     buildNumber: "1",
     supportsTablet: false, // portrait-only
     config: {
@@ -59,7 +59,8 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
 
   android: {
     package: "com.astroroast.app",
-    googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
+    googleServicesFile:
+      process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
     versionCode: 1,
     adaptiveIcon: {
       foregroundImage: "./assets/icons/android/adaptive-foreground.png",

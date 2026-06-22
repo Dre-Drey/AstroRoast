@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { Linking } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { StatusBar } from "expo-status-bar";
@@ -20,6 +22,8 @@ import { SplashScreen } from "./src/screens/SplashScreen";
 import { useAuth } from "./src/contexts/AuthContext";
 import { RootTabParamList } from "./src/types/navigation";
 
+import { handleDeepLink } from "./src/lib/deepLink";
+
 const queryClient = new QueryClient();
 
 enableScreens(true);
@@ -40,6 +44,24 @@ const THEME = {
 };
 
 export default function App() {
+  // Handle deep linking
+  useEffect(() => {
+    const handleInitialURL = async () => {
+      const url = await Linking.getInitialURL();
+      if (url) {
+        await handleDeepLink(url);
+      }
+    };
+
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      handleDeepLink(url);
+    });
+
+    handleInitialURL();
+
+    return () => subscription.remove();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={styles.root}>

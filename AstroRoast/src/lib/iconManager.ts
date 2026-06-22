@@ -13,18 +13,18 @@ const IconManagerModule = NativeModules.IconManager || {
 
 // Mapping zodiac signs to icon names
 const ZODIAC_ICON_NAMES: Record<AstroSign, string> = {
-  Aries: "aries",
-  Taurus: "taurus",
-  Gemini: "gemini",
-  Cancer: "cancer",
-  Leo: "leo",
-  Virgo: "virgo",
-  Libra: "libra",
-  Scorpio: "scorpio",
-  Sagittarius: "sagittarius",
-  Capricorn: "capricorn",
-  Aquarius: "aquarius",
-  Pisces: "pisces",
+  aries: "aries",
+  taurus: "taurus",
+  gemini: "gemini",
+  cancer: "cancer",
+  leo: "leo",
+  virgo: "virgo",
+  libra: "libra",
+  scorpio: "scorpio",
+  sagittarius: "sagittarius",
+  capricorn: "capricorn",
+  aquarius: "aquarius",
+  pisces: "pisces",
 };
 
 const STORAGE_KEY = "app_icon_sign";

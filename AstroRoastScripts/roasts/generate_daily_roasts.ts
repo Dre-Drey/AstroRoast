@@ -122,6 +122,9 @@ async function generateRoastsForEvent(
         maxTokens: 4096,
       });
 
+      console.log(
+        `Model response received for ${event.date} on attempt ${attempt}`,
+      );
       const raw = response.choices?.[0]?.message?.content ?? "";
       const text = Array.isArray(raw)
         ? raw.map((b: any) => b.text ?? "").join("")
@@ -226,8 +229,8 @@ async function upsertRoasts(
 
 // MAIN FUNCTION
 async function generateWeeklyRoasts(): Promise<void> {
-  const NUMBER_OF_DAYS = 1; // adjust as needed
-  const startDate = new Date().toISOString().split("T")[0];
+  const NUMBER_OF_DAYS = 2; // adjust as needed
+  const startDate = new Date('2026-06-23').toISOString().split("T")[0];
 
   const { data: events, error } = await supabase
     .from("cosmic_events")
