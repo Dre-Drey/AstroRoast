@@ -163,7 +163,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
               {data?.sign?.toUpperCase()}
             </Text>
             <Text style={styles.displayMd}>
-              {todayDate.toLocaleDateString(undefined, options)}
+              {todayDate.toLocaleDateString("en-US", options)}
             </Text>
           </View>
 
