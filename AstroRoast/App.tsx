@@ -23,6 +23,26 @@ import { useAuth } from "./src/contexts/AuthContext";
 import { RootTabParamList } from "./src/types/navigation";
 
 import { handleDeepLink } from "./src/lib/deepLink";
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://39759842472ad82ccf0ca9023b84d3a1@o4511631548416000.ingest.de.sentry.io/4511631555362896',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Enable Logs
+  enableLogs: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 const queryClient = new QueryClient();
 
@@ -43,7 +63,7 @@ const THEME = {
   },
 };
 
-export default function App() {
+export default Sentry.wrap(function App() {
   // Handle deep linking
   useEffect(() => {
     const handleInitialURL = async () => {
@@ -74,7 +94,7 @@ export default function App() {
       </GestureHandlerRootView>
     </QueryClientProvider>
   );
-}
+});
 
 function AppNavigator() {
   const { session, loading } = useAuth();

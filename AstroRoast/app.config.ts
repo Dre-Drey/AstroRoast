@@ -96,6 +96,14 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
         faceIDPermission: "AstroRoast uses Face ID to secure your session.",
       },
     ],
+    [
+      "@sentry/react-native/expo",
+      {
+        "url": "https://sentry.io/",
+        "project": "react-native",
+        "organization": "astroroast"
+      }
+    ]
   ],
 
   description:

@@ -4,6 +4,7 @@ import { captureRef } from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { File, Paths } from "expo-file-system";
 import {
+  Button,
   StyleSheet,
   Text,
   View,
@@ -22,6 +23,7 @@ import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 import DisclaimerForm from "../components/DisclaimerForm";
 import { log } from "../lib/log";
 import { useProfileQuery } from "../hooks/useProfileQuery";
+import * as Sentry from "@sentry/react-native";
 
 export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();
