@@ -61,7 +61,7 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
     package: "com.astroroast.app",
     googleServicesFile:
       process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
-    versionCode: 1,
+    versionCode: 2,
     adaptiveIcon: {
       foregroundImage: "./assets/icons/android/adaptive-foreground.png",
       backgroundImage: "./assets/icons/android/adaptive-background.png",
