@@ -415,8 +415,8 @@ export const AuthScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.void },
-  content: { padding: 20, paddingTop: 40 },
+  container: { flex: 1, backgroundColor: COLORS.void, marginBottom: 40 },
+  content: { padding: 20, paddingTop: 40, marginBottom: 40 },
   title: {
     marginBottom: 40,
     marginTop: 40,
@@ -549,6 +549,7 @@ const styles = StyleSheet.create({
     padding: 24,
     borderRadius: 0, // Brutalism Rule
     alignItems: "center",
+    marginBottom: 100,
   },
   buttonText: {
     color: COLORS.void,
