@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,67 +14,20 @@ import { ProfileScreenProps } from "../types/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { registerForPushNotificationsAsync } from "../lib/notifications";
 import { log } from "../lib/log";
+import { useProfileQuery } from "../hooks/useProfileQuery";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   const { session, signOut, loading } = useAuth();
-  const [dataLoading, setDataLoading] = useState(true);
-  const [profileError, setProfileError] = useState<string | null>(null);
   const [updatingNotifications, setUpdatingNotifications] = useState(false);
-
-  const [email, setEmail] = useState<string | undefined>("");
-  const [sign, setSign] = useState<string>("");
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-
-  const loadProfile = useCallback(async () => {
-    setDataLoading(true);
-    setProfileError(null);
-
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
-        return;
-      }
-
-      setEmail(user.email);
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("astro_sign, expo_push_token")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        log.error("Error fetching profile:", error);
-        setProfileError(
-          "We could not load your profile right now. Check your connection and tap Retry.",
-        );
-        return;
-      }
-
-      if (data) {
-        setSign(data.astro_sign);
-        setNotificationsEnabled(!!data.expo_push_token);
-      }
-    } catch (error) {
-      log.error("Error fetching profile:", error);
-      setProfileError(
-        "We could not load your profile right now. Check your connection and tap Retry.",
-      );
-    } finally {
-      setDataLoading(false);
-    }
-  }, []);
+  const queryClient = useQueryClient();
+  const profileQuery = useProfileQuery();
+  const profile = profileQuery.data;
 
   useEffect(() => {
-    if (!session) {
-      setDataLoading(false);
-      setProfileError(null);
-      return;
-    }
-
-    void loadProfile();
-  }, [session, loadProfile]);
+    setNotificationsEnabled(!!profile?.expo_push_token);
+  }, [profile?.expo_push_token]);
 
   const handleSignOut = async () => {
     try {
@@ -99,13 +52,16 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
                 Alert.alert("Error", "User not authenticated.");
                 return;
               }
-              const response = await fetch("https://sfczdfyolkrwgwsfdimz.supabase.co/functions/v1/delete-account", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${session.access_token}`,
+              const response = await fetch(
+                "https://sfczdfyolkrwgwsfdimz.supabase.co/functions/v1/delete-account",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${session.access_token}`,
+                  },
                 },
-              });
+              );
               if (response.ok) {
                 await supabase.auth.signOut();
                 Alert.alert(
@@ -178,6 +134,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
         }
         setNotificationsEnabled(false);
       }
+      await queryClient.invalidateQueries({
+        queryKey: ["profile", session.user.id],
+      });
     } catch (error) {
       Alert.alert(
         "Error",
@@ -188,7 +147,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
     }
   };
 
-  if (loading || dataLoading) {
+  if (loading || profileQuery.isLoading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator color={COLORS.primary} />
@@ -201,16 +160,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
 
   return (
     <View style={styles.container}>
-      {profileError ? (
+      {profileQuery.isError ? (
         <View style={styles.center}>
           <Text style={styles.displayMd}>PROFILE OFFLINE</Text>
           <Text style={[styles.labelMd, styles.errorMessage]}>
-            {profileError}
+            {(profileQuery.error as Error).message ||
+              "We could not load your profile right now. Check your connection and tap Retry."}
           </Text>
           <TouchableOpacity
             style={styles.retryButton}
             onPress={() => {
-              void loadProfile();
+              void profileQuery.refetch();
             }}
             accessibilityRole="button"
             accessibilityLabel="Retry loading profile"
@@ -229,12 +189,16 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
           <View style={styles.infoSection}>
             <View style={styles.infoBlock}>
               <Text style={styles.labelSm}>EMAIL_LOG</Text>
-              <Text style={styles.infoValue}>{email?.toUpperCase()}</Text>
+              <Text style={styles.infoValue}>
+                {session?.user.email?.toUpperCase()}
+              </Text>
             </View>
 
             <View style={styles.infoBlock}>
               <Text style={styles.labelSm}>ASTRO_ASSIGNMENT</Text>
-              <Text style={styles.infoValue}>{sign.toUpperCase()}</Text>
+              <Text style={styles.infoValue}>
+                {profile?.astro_sign.toUpperCase()}
+              </Text>
             </View>
           </View>
 

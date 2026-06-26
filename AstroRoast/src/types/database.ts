@@ -19,6 +19,11 @@ export interface Profile {
   updated_at?: string;
 }
 
+export type ProfileSettings = {
+  astro_sign: AstroSign;
+  expo_push_token: string | null;
+};
+
 export type DailyRoast = {
   id: string;
   sign: AstroSign;

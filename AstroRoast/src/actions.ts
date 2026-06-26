@@ -1,5 +1,5 @@
 import { supabase } from "./lib/supabase";
-import { CosmicEvent, DailyRoast } from "./types/database";
+import { CosmicEvent, DailyRoast, ProfileSettings } from "./types/database";
 import { log } from "./lib/log";
 
 const NETWORK_ERROR_MESSAGE =
@@ -9,34 +9,35 @@ const ROAST_NOT_AVAILABLE_MESSAGE =
 const SIGN_IN_REQUIRED_MESSAGE =
   "Please sign in again to load your Daily Roast.";
 
-export const fetchDailyRoast = async (): Promise<DailyRoast> => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    throw new Error(SIGN_IN_REQUIRED_MESSAGE);
-  }
-
-  const { data: profile, error: profileError } = await supabase
+export const fetchProfile = async (
+  userId: string,
+): Promise<ProfileSettings> => {
+  const { data, error } = await supabase
     .from("profiles")
-    .select("astro_sign")
-    .eq("id", user.id)
+    .select("astro_sign, expo_push_token")
+    .eq("id", userId)
     .single();
 
-  if (profileError) {
-    log.error("Error fetching profile for daily roast:", profileError);
+  if (error) {
+    log.error("Error fetching profile:", error);
     throw new Error(NETWORK_ERROR_MESSAGE);
   }
 
-  if (!profile) {
+  if (!data) {
     throw new Error(SIGN_IN_REQUIRED_MESSAGE);
   }
 
+  return data as ProfileSettings;
+};
+
+export const fetchDailyRoast = async (
+  astroSign: DailyRoast["sign"],
+): Promise<DailyRoast> => {
   const today = new Date().toISOString().split("T")[0];
   const { data, error } = await supabase
     .from("daily_roasts")
     .select("id, sign, hook, advice, content")
-    .eq("sign", profile.astro_sign)
+    .eq("sign", astroSign)
     .eq("date", today);
 
   if (error) {

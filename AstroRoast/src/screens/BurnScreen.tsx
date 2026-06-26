@@ -21,11 +21,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 import DisclaimerForm from "../components/DisclaimerForm";
 import { log } from "../lib/log";
+import { useProfileQuery } from "../hooks/useProfileQuery";
 
 export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();
   const cardRef = useRef(null);
-  const notificationEnabled = false; // Placeholder for notification toggle state
+  const profileQuery = useProfileQuery();
+  const profile = profileQuery.data;
   const {
     data,
     isLoading,
@@ -33,8 +35,9 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
     error,
     refetch: refetchDailyRoast,
   } = useQuery({
-    queryKey: ["dailyRoast"],
-    queryFn: () => fetchDailyRoast(),
+    queryKey: ["dailyRoast", profile?.astro_sign],
+    queryFn: () => fetchDailyRoast(profile!.astro_sign),
+    enabled: !!profile?.astro_sign,
     retry: 1,
   });
 
@@ -58,7 +61,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
     day: "numeric",
   };
 
-  if (isLoading || loading) {
+  if (loading || profileQuery.isLoading || isLoading) {
     return (
       <View
         style={styles.center}
@@ -93,7 +96,28 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
     );
   }
 
+  if (profileQuery.isError) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.displayMd}>PROFILE OFFLINE</Text>
+        <Text style={styles.errorText}>
+          {(profileQuery.error as Error).message ||
+            "We could not load your profile right now."}
+        </Text>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={() => {
+            void profileQuery.refetch();
+          }}
+        >
+          <Text style={styles.retryButtonText}>RETRY</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   const signColor = data?.sign ? SIGN_COLORS[data.sign] : COLORS.primary;
+  const notificationEnabled = !!profile?.expo_push_token;
 
   const handleShare = async () => {
     try {
