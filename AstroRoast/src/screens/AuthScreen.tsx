@@ -9,6 +9,7 @@ import {
   Switch,
   Linking,
 } from "react-native";
+import { Eye, EyeOff } from "lucide-react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { supabase } from "../lib/supabase";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
@@ -21,6 +22,9 @@ export const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const [selectedSign, setSelectedSign] = useState<AstroSign | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -207,38 +211,74 @@ export const AuthScreen: React.FC = () => {
         </View>
         <View style={styles.inputGroup}>
           <Text style={styles.inputLabel}>PASSWORD</Text>
-          <TextInput
-            onChangeText={setPassword}
-            value={password}
-            secureTextEntry
-            placeholder="Password"
-            placeholderTextColor="#a7a7a7"
-            autoCapitalize="none"
-            autoComplete="password"
-            textContentType="password"
-            returnKeyType={isSignUp ? "next" : "done"}
-            style={styles.input}
-            accessibilityLabel="Password"
-            accessibilityHint="Enter your account password."
-          />
-        </View>
-        {isSignUp && (
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>CONFIRM_PASSWORD</Text>
+          <View style={styles.passwordFieldRow}>
             <TextInput
-              onChangeText={setConfirmPassword}
-              value={confirmPassword}
-              secureTextEntry
-              placeholder="Confirm Password"
+              onChangeText={setPassword}
+              value={password}
+              secureTextEntry={!showPassword}
+              placeholder="Password"
               placeholderTextColor="#a7a7a7"
               autoCapitalize="none"
               autoComplete="password"
               textContentType="password"
-              returnKeyType="done"
-              style={styles.input}
-              accessibilityLabel="Confirm password"
-              accessibilityHint="Re-enter the same password to confirm it."
+              returnKeyType={isSignUp ? "next" : "done"}
+              style={[styles.input, styles.passwordInput]}
+              accessibilityLabel="Password"
+              accessibilityHint="Enter your account password."
             />
+            <TouchableOpacity
+              onPress={() => setShowPassword((value) => !value)}
+              style={styles.passwordToggle}
+              accessibilityRole="button"
+              accessibilityLabel={
+                showPassword ? "Hide password" : "Show password"
+              }
+              accessibilityHint="Toggles password visibility."
+            >
+              {showPassword ? (
+                <EyeOff size={20} color={COLORS.primary} />
+              ) : (
+                <Eye size={20} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+        {isSignUp && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>CONFIRM_PASSWORD</Text>
+            <View style={styles.passwordFieldRow}>
+              <TextInput
+                onChangeText={setConfirmPassword}
+                value={confirmPassword}
+                secureTextEntry={!showConfirmPassword}
+                placeholder="Confirm Password"
+                placeholderTextColor="#a7a7a7"
+                autoCapitalize="none"
+                autoComplete="password"
+                textContentType="password"
+                returnKeyType="done"
+                style={[styles.input, styles.passwordInput]}
+                accessibilityLabel="Confirm password"
+                accessibilityHint="Re-enter the same password to confirm it."
+              />
+              <TouchableOpacity
+                onPress={() => setShowConfirmPassword((value) => !value)}
+                style={styles.passwordToggle}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  showConfirmPassword
+                    ? "Hide confirm password"
+                    : "Show confirm password"
+                }
+                accessibilityHint="Toggles confirm password visibility."
+              >
+                {showConfirmPassword ? (
+                  <EyeOff size={20} color={COLORS.primary} />
+                ) : (
+                  <Eye size={20} color={COLORS.primary} />
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </View>
@@ -426,6 +466,20 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.outline,
     color: COLORS.primary,
     fontSize: 18,
+    paddingVertical: 10,
+  },
+  passwordFieldRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: COLORS.outline,
+  },
+  passwordInput: {
+    flex: 1,
+    borderBottomWidth: 0,
+  },
+  passwordToggle: {
+    paddingLeft: 12,
     paddingVertical: 10,
   },
   grid: {
