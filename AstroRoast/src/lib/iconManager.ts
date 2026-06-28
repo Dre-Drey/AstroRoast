@@ -37,8 +37,10 @@ const DEFAULT_ICON_NAME = "default";
 export async function setAppIcon(sign: AstroSign | null): Promise<void> {
   if (!sign) {
     // Reset to the default icon
-    await _updateAppIcon(null);
-    await AsyncStorage.setItem(STORAGE_KEY, DEFAULT_ICON_NAME);
+    const updated = await _updateAppIcon(null);
+    if (updated) {
+      await AsyncStorage.setItem(STORAGE_KEY, DEFAULT_ICON_NAME);
+    }
     return;
   }
 
@@ -49,9 +51,11 @@ export async function setAppIcon(sign: AstroSign | null): Promise<void> {
   }
 
   try {
-    await _updateAppIcon(iconName);
-    await AsyncStorage.setItem(STORAGE_KEY, iconName);
-    log.log(`✓ Icon set to: ${iconName}`);
+    const updated = await _updateAppIcon(iconName);
+    if (updated) {
+      await AsyncStorage.setItem(STORAGE_KEY, iconName);
+      log.log(`✓ Icon set to: ${iconName}`);
+    }
   } catch (error) {
     log.error("Error occurred while updating the app icon:", error);
     // Do not display an alert to avoid interrupting the UX
@@ -64,7 +68,15 @@ export async function setAppIcon(sign: AstroSign | null): Promise<void> {
 export async function getCurrentIcon(): Promise<string> {
   try {
     const stored = await AsyncStorage.getItem(STORAGE_KEY);
-    return stored || DEFAULT_ICON_NAME;
+    if (stored) {
+      return stored;
+    }
+
+    if (IconManagerModule.getCurrentIcon) {
+      return await IconManagerModule.getCurrentIcon();
+    }
+
+    return DEFAULT_ICON_NAME;
   } catch (error) {
     log.error("Error occurred while retrieving the app icon:", error);
     return DEFAULT_ICON_NAME;
@@ -74,16 +86,18 @@ export async function getCurrentIcon(): Promise<string> {
 /**
  * Call the native module to update the app icon, with error handling
  */
-async function _updateAppIcon(iconName: string | null): Promise<void> {
+async function _updateAppIcon(iconName: string | null): Promise<boolean> {
   try {
     if (!IconManagerModule.setIcon) {
       log.log("Module IconManager not available - icons ignored");
-      return;
+      return false;
     }
 
     await IconManagerModule.setIcon(iconName);
+    return true;
   } catch (error) {
     log.error("Error occurred while calling the native module:", error);
+    return false;
   }
 }
 

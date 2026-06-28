@@ -191,7 +191,11 @@ expo build:android
 #### Production Build (Managed):
 
 ```bash
-eas build --platform ios
+#iOS
+eas build --platform ios --profile production
+eas submit --patform ios --profile production
+
+#Android
 eas build --platform android
 ```
 

@@ -358,9 +358,7 @@ export const AuthScreen: React.FC = () => {
                 <Text
                   style={styles.termsLink}
                   onPress={() =>
-                    openTerms(
-                      "https://app.notion.com/p/Conditions-g-n-rales-d-utilisation-375480e3f16c8047b2b7ca2cad6969b8",
-                    )
+                    openTerms("https://astro-roast.vercel.app/terms.html")
                   }
                   accessibilityRole="link"
                   accessibilityLabel="Open general terms of use"
@@ -372,9 +370,7 @@ export const AuthScreen: React.FC = () => {
                 <Text
                   style={styles.termsLink}
                   onPress={() =>
-                    openTerms(
-                      "https://app.notion.com/p/Politique-de-confidentialit-375480e3f16c8067a3a6ddca2a2e5de0",
-                    )
+                    openTerms("https://astro-roast.vercel.app/privacy.html")
                   }
                   accessibilityRole="link"
                   accessibilityLabel="Open privacy policy"
