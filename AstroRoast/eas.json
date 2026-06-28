@@ -28,7 +28,7 @@
       "env": {
         "SENTRY_AUTH_TOKEN": "$SENTRY_AUTH_TOKEN",
         "SENTRY_ORG": "astroroast",
-        "SENTRY_PROJECT": "astroroast"
+        "SENTRY_PROJECT": "react-native"
       }
     }
   },
