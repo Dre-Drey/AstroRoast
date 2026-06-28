@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terms of Use — AstroRoast</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --void: #0e0e0e;
+        --surface-low: #161616;
+        --surface-high: #222222;
+        --primary: #f9f9f9;
+        --outline: rgba(249, 249, 249, 0.12);
+        --muted: rgba(249, 249, 249, 0.45);
+        --accent: #b552ff;
+      }
+
+      body {
+        background: var(--void);
+        color: var(--primary);
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 16px;
+        line-height: 1.7;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 40px;
+        border-bottom: 1px solid var(--outline);
+      }
+
+      .nav-logo {
+        font-family: "Space Mono", monospace;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      .nav-logo span {
+        color: #ffd60a;
+      }
+
+      .nav-back {
+        font-family: "Space Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-back:hover {
+        color: var(--primary);
+      }
+
+      .page-header {
+        border-bottom: 1px solid var(--outline);
+        padding: 60px 40px 48px;
+        background: var(--surface-low);
+      }
+
+      .page-header-inner {
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .page-eyebrow {
+        font-family: "Space Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+      }
+
+      .page-title {
+        font-size: clamp(32px, 5vw, 52px);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.05;
+        margin-bottom: 20px;
+      }
+
+      .page-meta {
+        font-family: "Space Mono", monospace;
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+      }
+
+      .content {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 64px 40px 120px;
+      }
+
+      .placeholder-notice {
+        border: 1px solid var(--accent);
+        background: rgba(181, 82, 255, 0.06);
+        padding: 16px 20px;
+        margin-bottom: 56px;
+        font-family: "Space Mono", monospace;
+        font-size: 12px;
+        color: var(--accent);
+        letter-spacing: 0.05em;
+      }
+
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin-top: 52px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--outline);
+      }
+
+      h2:first-of-type {
+        margin-top: 0;
+      }
+
+      p {
+        color: rgba(249, 249, 249, 0.75);
+        margin-bottom: 16px;
+      }
+
+      ul {
+        color: rgba(249, 249, 249, 0.75);
+        padding-left: 20px;
+        margin-bottom: 16px;
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      strong {
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      footer {
+        border-top: 1px solid var(--outline);
+        padding: 32px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 28px;
+      }
+
+      .footer-links a {
+        font-family: "Space Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      .footer-links a:hover {
+        color: var(--primary);
+      }
+
+      .footer-copy {
+        font-family: "Space Mono", monospace;
+        font-size: 11px;
+        color: rgba(249, 249, 249, 0.2);
+      }
+
+      @media (max-width: 640px) {
+        nav,
+        .page-header,
+        .content,
+        footer {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="/" class="nav-logo">Astro<span>Roast</span></a>
+      <a href="/" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path
+            d="M9 2L4 7l5 5"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        Back
+      </a>
+    </nav>
+
+    <div class="page-header">
+      <div class="page-header-inner">
+        <p class="page-eyebrow">Legal</p>
+        <h1 class="page-title">Terms of Use</h1>
+        <p class="page-meta">
+          Last updated: 4th June 2026
+          <!-- UPDATE DATE -->
+          · Effective: 4th June 2026
+          <!-- EFFECTIVE DATE -->
+        </p>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="placeholder-notice">
+        These General Terms and Conditions of Use (“Terms of Use”) govern access
+        to and use of the AstroRoast mobile application (the “Application”). By
+        creating an account or using the Application, you accept these Terms of
+        Use without reservation. If you do not agree with these terms, please do
+        not use the Application.
+      </div>
+
+      <h2>1. Description of Service</h2>
+      <p>
+        AstroRoast is an entertainment app that offers users a personalized
+        daily horoscope based on their zodiac sign, written in a humorous,
+        satirical, and biting tone (a "roast"). <br />
+        The App currently includes:
+      </p>
+      <ul>
+        <li>An authentication system (account creation via email/password).</li>
+        <li>
+          Display of a daily horoscope, a humorous piece of advice, and the
+          current date.
+        </li>
+        <li>A feature to share the horoscope on social media.</li>
+        <li>The option to enable or disable daily notifications.</li>
+        <li>A profile screen allowing for logout and account deletion.</li>
+      </ul>
+      <p>The App is currently 100% free.</p>
+
+      <h2>2. Eligibility and Account Creation</h2>
+      <ul>
+        <li>
+          Minimum age: The Application is intended for an **adult** audience,
+          due to the satirical humor used.
+        </li>
+        <li>
+          Data accuracy: You agree to provide accurate information when
+          registering (valid email address and astrological sign).
+        </li>
+        <li>
+          Account security: You are responsible for the confidentiality of your
+          password and for all activities associated with your account.
+        </li>
+      </ul>
+
+      <h2>3. Disclaimer (Humor & Entertainment Warning)</h2>
+      <p>
+        IMPORTANT:AstroRoast is an application dedicated exclusively to
+        **entertainment**. Horoscopes and advice are generated using artificial
+        intelligence technology. Although the tool is configured and tested to
+        deliver a humorous and satirical tone—and the content is moderated by
+        the publisher—these texts should under no circumstances be taken
+        seriously or interpreted as medical, financial, legal, professional, or
+        personal advice.
+      </p>
+      <p>
+        The Application’s publisher cannot be held liable for any emotional
+        reactions, life decisions, or actions taken by the user as a result of
+        reading a horoscope or advice provided by AstroRoast. You use the
+        Application at your own risk and with a healthy dose of tongue-in-cheek
+        humor.
+      </p>
+      <p>
+        If any generated text appears inappropriate, the user can quickly report
+        it directly within the app using the “report this roast” button.
+      </p>
+      <h2>4. Intellectual Property & Sharing</h2>
+      <ul>
+        <li>
+          App Content: The text, designs, logos, and horoscope generation
+          algorithms are the exclusive property of AstroRoast.
+        </li>
+        <li>
+          License of Use: We grant you a limited, non-exclusive, and revocable
+          license to use the App for strictly personal, non-commercial purposes.
+        </li>
+        <li>
+          Social Media Sharing: You are expressly authorized (and encouraged!)
+          to share screenshots of your daily horoscopes using the built-in
+          sharing feature. However, any malicious alteration of the text
+          intended to defame a third party or damage AstroRoast's image is
+          strictly prohibited.
+        </li>
+      </ul>
+
+      <h2>5. Account Termination and Deletion</h2>
+      <ul>
+        <li>
+          By the user: You may stop using the Application and permanently delete
+          your account at any time directly from the "Profile" screen. This
+          action will result in the deletion of your data in accordance with our
+          Privacy Policy.
+        </li>
+        <li>
+          By the publisher: We reserve the right to suspend or close your
+          account at any time, without prior notice, in the event of a violation
+          of these Terms of Use or misuse of the Application's services.
+        </li>
+      </ul>
+
+      <h2>6. Service Availability and Warranty</h2>
+      <p>
+        The Application is provided on an "as is" and "as available" basis.
+        Although we use modern technologies (React Native, Expo, Supabase), we
+        do not guarantee that the Application will be entirely free from errors,
+        bugs, or interruptions.<br />
+        We reserve the right to modify, suspend, or discontinue the Application
+        (or any part thereof) at any time, temporarily or permanently, with or
+        without notice.
+      </p>
+
+      <h2>7. Changes to Terms</h2>
+      <p>
+        We may modify these Terms of Use at any time to reflect changes to the
+        Application or to regulations. By continuing to use the Application
+        after the changes are published, you accept the new Terms of Use.
+      </p>
+
+      <h2>8. Governing Law</h2>
+      <p>
+        These Terms of Use are governed by and construed in accordance with
+        French law. Any dispute relating to the use of AstroRoast shall be
+        subject to the jurisdiction of the competent courts of Paris, France.
+      </p>
+
+      <h2>9. Contact</h2>
+      <p>
+        For any questions about these Terms, contact us at
+        <a href="mailto:astroroastapp@gmail.com">astroroastapp@gmail.com</a>.
+      </p>
+    </div>
+
+    <footer>
+      <div class="footer-links">
+        <a href="/index.html">Home</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="mailto:astroroastapp@gmail.com">Contact</a>
+      </div>
+      <span class="footer-copy">© 2025 AstroRoast</span>
+    </footer>
+  </body>
+</html>
