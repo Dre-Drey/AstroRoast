@@ -1,9 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Linking } from "react-native";
+import * as Notifications from "expo-notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import {
+  NavigationContainer,
+  DefaultTheme,
+  createNavigationContainerRef,
+} from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -22,11 +27,14 @@ import { SplashScreen } from "./src/screens/SplashScreen";
 import { useAuth } from "./src/contexts/AuthContext";
 import { RootTabParamList } from "./src/types/navigation";
 
-import { handleDeepLink } from "./src/lib/deepLink";
-import * as Sentry from '@sentry/react-native';
+import {
+  handleDeepLinkEmailConfirmation,
+  isEmailConfirmationUrl,
+} from "./src/lib/deepLink";
+import * as Sentry from "@sentry/react-native";
 
 Sentry.init({
-  dsn: 'https://39759842472ad82ccf0ca9023b84d3a1@o4511631548416000.ingest.de.sentry.io/4511631555362896',
+  dsn: "https://39759842472ad82ccf0ca9023b84d3a1@o4511631548416000.ingest.de.sentry.io/4511631555362896",
 
   // Adds more context data to events (IP address, cookies, user, etc.)
   // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
@@ -45,6 +53,7 @@ Sentry.init({
 });
 
 const queryClient = new QueryClient();
+const navigationRef = createNavigationContainerRef<RootTabParamList>();
 
 enableScreens(true);
 
@@ -64,24 +73,6 @@ const THEME = {
 };
 
 export default Sentry.wrap(function App() {
-  // Handle deep linking
-  useEffect(() => {
-    const handleInitialURL = async () => {
-      const url = await Linking.getInitialURL();
-      if (url) {
-        await handleDeepLink(url);
-      }
-    };
-
-    const subscription = Linking.addEventListener("url", ({ url }) => {
-      handleDeepLink(url);
-    });
-
-    handleInitialURL();
-
-    return () => subscription.remove();
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={styles.root}>
@@ -98,13 +89,63 @@ export default Sentry.wrap(function App() {
 
 function AppNavigator() {
   const { session, loading } = useAuth();
+  const [navigationReady, setNavigationReady] = useState(false);
+  const [pendingRoute, setPendingRoute] = useState<keyof RootTabParamList | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const handleInitialURL = async () => {
+      const url = await Linking.getInitialURL();
+      if (url && isEmailConfirmationUrl(url)) {
+        await handleDeepLinkEmailConfirmation(url);
+      }
+    };
+
+    void handleInitialURL();
+  }, []);
+
+  useEffect(() => {
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      if (isEmailConfirmationUrl(url)) {
+        void handleDeepLinkEmailConfirmation(url);
+      }
+    });
+
+    const notificationSubscription =
+      Notifications.addNotificationResponseReceivedListener(() => {
+        if (loading) {
+          return;
+        }
+
+        setPendingRoute(session ? "Burn" : "Auth");
+      });
+
+    return () => {
+      subscription.remove();
+      notificationSubscription.remove();
+    };
+  }, [loading, session]);
+
+  useEffect(() => {
+    if (!navigationReady || !pendingRoute || !navigationRef.isReady()) {
+      return;
+    }
+
+    navigationRef.navigate(pendingRoute);
+    setPendingRoute(null);
+  }, [navigationReady, pendingRoute]);
 
   if (loading) {
     return <SplashScreen />;
   }
 
   return (
-    <NavigationContainer theme={THEME}>
+    <NavigationContainer
+      ref={navigationRef}
+      theme={THEME}
+      onReady={() => setNavigationReady(true)}
+    >
       {session ? (
         <Tab.Navigator
           screenOptions={{
