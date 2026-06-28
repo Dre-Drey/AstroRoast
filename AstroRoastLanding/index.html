@@ -90,10 +90,6 @@
         text-decoration: none;
       }
 
-      .nav-logo span {
-        color: var(--leo);
-      }
-
       .nav-cta {
         font-family: "Space Mono", monospace;
         font-size: 12px;
@@ -305,14 +301,14 @@
           transform: translateX(0);
         }
         to {
-          transform: translateX(-50%);
+          transform: translateX(-100%);
         }
       }
 
       /* ─── FEATURES ─── */
       .features-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1px;
         background: var(--outline);
         border: 1px solid var(--outline);
@@ -499,14 +495,47 @@
 
     <!-- NAV -->
     <nav>
-      <a href="/index.html" class="nav-logo">Astro<span>Roast</span></a>
+      <div>
+        <a href="./index.html" class="nav-logo">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="10"
+            height="10"
+            viewBox="0 0 20 20"
+            fill="#ffffff"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+            />
+          </svg>
+          AstroRoast
+        </a>
+      </div>
       <a href="#download" class="nav-cta">Download</a>
     </nav>
 
     <!-- HERO -->
     <div class="hero">
       <p class="hero-eyebrow">Daily horoscope · Real astrology · Zero fluff</p>
-      <h1 class="hero-title">AstroRoast</h1>
+      <h1 class="hero-title">
+        AstroRoast<svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 20 20"
+          fill="#ffffff"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+          />
+        </svg>
+      </h1>
       <p class="hero-tagline">
         <strong
           >The stars don't guide you.<br />
@@ -574,7 +603,20 @@
     <section id="why">
       <p class="section-eyebrow">Why AstroRoast?</p>
       <h2 class="section-title">
-        Astrology that actually<br />tells you something.
+        Astrology that actually<br />tells you something<svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="10"
+          height="10"
+          viewBox="0 0 20 20"
+          fill="#ffffff"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+          />
+        </svg>
       </h2>
       <p class="section-sub">
         Built on real planetary positions calculated with
@@ -635,20 +677,51 @@
     <!-- SCREENSHOTS -->
     <section class="screenshots-section" id="screenshots">
       <p class="section-eyebrow">The app</p>
-      <h2 class="section-title">See what the stars<br />have against you.</h2>
+      <h2 class="section-title">
+        See what the stars<br />have against you<svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="10"
+          height="10"
+          viewBox="0 0 20 20"
+          fill="#ffffff"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+          />
+        </svg>
+      </h2>
 
       <div class="screenshots-row">
         <div class="screenshot-placeholder">
-          <img src="./images/roast_example.png" alt="Screenshot 1" />
+          <img
+            class="screenshot-placeholder"
+            src="./images/roast_example.png"
+            alt="Screenshot 1"
+          />
         </div>
         <div class="screenshot-placeholder">
-          <img src="./images/share_card.png" alt="Screenshot 2" />
+          <img
+            class="screenshot-placeholder"
+            src="./images/share_card.png"
+            alt="Screenshot 2"
+          />
         </div>
         <div class="screenshot-placeholder">
-          <img src="/images/roast_example.png" alt="Screenshot 3" />
+          <img
+            class="screenshot-placeholder"
+            src="./images/profile.jpg"
+            alt="Screenshot 3"
+          />
         </div>
         <div class="screenshot-placeholder">
-          <img src="/images/share_card.png" alt="Screenshot 4" />
+          <img
+            class="screenshot-placeholder"
+            src="./images/roast_example2.png"
+            alt="Screenshot 4"
+          />
         </div>
       </div>
     </section>
@@ -692,13 +765,13 @@
 
     <!-- FOOTER -->
     <footer>
-      <a href="/index.html" class="footer-logo">AstroRoast</a>
+      <a href="./index.html" class="footer-logo">AstroRoast</a>
       <div class="footer-links">
         <a href="mailto:astroroastapp@gmail.com">Contact</a>
-        <a href="/privacy.html">Privacy Policy</a>
-        <a href="/terms.html">Terms of Use</a>
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html">Terms of Use</a>
       </div>
-      <span class="footer-copy">© 2025 AstroRoast</span>
+      <span class="footer-copy">© 2026 AstroRoast</span>
     </footer>
 
     <script>
