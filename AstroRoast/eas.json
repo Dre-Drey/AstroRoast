@@ -26,7 +26,9 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "SENTRY_AUTH_TOKEN2": "$SENTRY_AUTH_TOKEN2"
+        "SENTRY_AUTH_TOKEN": "$SENTRY_AUTH_TOKEN",
+        "SENTRY_ORG": "astroroast",
+        "SENTRY_PROJECT": "astroroast"
       }
     }
   },
