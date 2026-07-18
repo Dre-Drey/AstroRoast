@@ -101,25 +101,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  labelLg: {
-    color: COLORS.primary,
-    fontSize: 18,
-    fontWeight: "600",
-    letterSpacing: 2,
-    marginBottom: 8,
-  },
   labelMd: {
     color: COLORS.primary,
     fontSize: 14,
     fontWeight: "600",
     letterSpacing: 2,
-  },
-  displayMd: {
-    color: COLORS.primary,
-    fontSize: 38,
-    lineHeight: 38,
-    fontWeight: "700",
-    letterSpacing: -1,
   },
   displayLg: {
     color: COLORS.primary,
@@ -130,13 +116,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inputGroup: { marginVertical: 25, width: "100%" },
-  inputLabel: {
-    color: COLORS.primary,
-    fontSize: 18,
-    letterSpacing: 1,
-    marginBottom: 8,
-    fontFamily: "SpaceGrotesk_700Bold", // Si chargée
-  },
   input: {
     borderWidth: 2,
     borderColor: COLORS.outline,
