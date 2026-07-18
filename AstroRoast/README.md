@@ -193,10 +193,10 @@ expo build:android
 ```bash
 #iOS
 eas build --platform ios --profile production
-eas submit --patform ios --profile production
+eas submit --platform ios --profile production
 
 #Android
-eas build --platform android
+eas build --platform android --profile production
 ```
 
 See [Expo Docs](https://docs.expo.dev/) for detailed build instructions.
