@@ -24,12 +24,16 @@ import { ProfileScreen } from "./src/screens/ProfileScreen";
 import { AuthScreen } from "./src/screens/AuthScreen";
 import { AuthProvider } from "./src/contexts/AuthContext";
 import { SplashScreen } from "./src/screens/SplashScreen";
+import NewPasswordScreen from "./src/screens/NewPasswordScreen";
+import ForgotPasswordScreen from "./src/screens/ForgotPasswordScreen";
 import { useAuth } from "./src/contexts/AuthContext";
 import { RootTabParamList } from "./src/types/navigation";
 
 import {
   handleDeepLinkEmailConfirmation,
   isEmailConfirmationUrl,
+  handlePasswordResetUrl,
+  isPasswordResetUrl,
 } from "./src/lib/deepLink";
 import * as Sentry from "@sentry/react-native";
 
@@ -90,15 +94,23 @@ export default Sentry.wrap(function App() {
 function AppNavigator() {
   const { session, loading } = useAuth();
   const [navigationReady, setNavigationReady] = useState(false);
-  const [pendingRoute, setPendingRoute] = useState<keyof RootTabParamList | null>(
-    null,
-  );
+  const [pendingRoute, setPendingRoute] = useState<
+    keyof RootTabParamList | null
+  >(null);
+  const [isRecoveringPassword, setIsRecoveringPassword] = useState(false);
 
   useEffect(() => {
     const handleInitialURL = async () => {
       const url = await Linking.getInitialURL();
+      if (!url) return;
+
       if (url && isEmailConfirmationUrl(url)) {
         await handleDeepLinkEmailConfirmation(url);
+      }
+
+      if (url && isPasswordResetUrl(url)) {
+        setIsRecoveringPassword(true);
+        await handlePasswordResetUrl(url);
       }
     };
 
@@ -106,9 +118,13 @@ function AppNavigator() {
   }, []);
 
   useEffect(() => {
-    const subscription = Linking.addEventListener("url", ({ url }) => {
+    const subscription = Linking.addEventListener("url", async ({ url }) => {
       if (isEmailConfirmationUrl(url)) {
         void handleDeepLinkEmailConfirmation(url);
+      }
+      if (isPasswordResetUrl(url)) {
+        setIsRecoveringPassword(true);
+        await handlePasswordResetUrl(url);
       }
     });
 
@@ -131,6 +147,9 @@ function AppNavigator() {
     if (!navigationReady || !pendingRoute || !navigationRef.isReady()) {
       return;
     }
+    if (isRecoveringPassword) {
+      return;
+    }
 
     navigationRef.navigate(pendingRoute);
     setPendingRoute(null);
@@ -140,6 +159,11 @@ function AppNavigator() {
     return <SplashScreen />;
   }
 
+  if (isRecoveringPassword) {
+    return (
+      <NewPasswordScreen onComplete={() => setIsRecoveringPassword(false)} />
+    );
+  }
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -196,6 +220,10 @@ function AppNavigator() {
           }}
         >
           <Stack.Screen name="Auth" component={AuthScreen} />
+          <Stack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
+          />
         </Stack.Navigator>
       )}
     </NavigationContainer>

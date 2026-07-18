@@ -18,7 +18,7 @@ import { setAppIcon } from "../lib/iconManager";
 import { registerForPushNotificationsAsync } from "../lib/notifications";
 import { log } from "../lib/log";
 
-export const AuthScreen: React.FC = () => {
+export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -243,6 +243,27 @@ export const AuthScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+        {!isSignUp && (
+          <TouchableOpacity
+            onPress={() => {
+              // Navigate to ForgotPasswordScreen
+              navigation.navigate("ForgotPassword");
+            }}
+            style={{ marginBottom: 20 }}
+            accessibilityRole="button"
+            accessibilityLabel="Forgot password"
+            accessibilityHint="Navigates to the forgot password screen."
+          >
+            <Text
+              style={[
+                styles.inputLabel,
+                { textDecorationLine: "underline", color: COLORS.primary },
+              ]}
+            >
+              FORGOT_PASSWORD
+            </Text>
+          </TouchableOpacity>
+        )}
         {isSignUp && (
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>CONFIRM_PASSWORD</Text>
