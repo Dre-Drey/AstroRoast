@@ -23,7 +23,6 @@ import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 import DisclaimerForm from "../components/DisclaimerForm";
 import { log } from "../lib/log";
 import { useProfileQuery } from "../hooks/useProfileQuery";
-import * as Sentry from "@sentry/react-native";
 
 export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();

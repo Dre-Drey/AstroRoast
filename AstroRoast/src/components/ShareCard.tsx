@@ -34,7 +34,7 @@ export default function ShareCard({
       importantForAccessibility="no-hide-descendants"
     >
       <Flame
-        size={380}
+        size={400}
         fill="#1a1c1c"
         stroke={signColor}
         opacity={0.3}
@@ -45,19 +45,17 @@ export default function ShareCard({
           display: "flex",
           flexDirection: "column",
           height: "100%",
-          justifyContent: "space-between",
+          justifyContent: "space-around",
         }}
       >
         <View style={styles.header}>
           <Text style={styles.appTitle}>DAILY ROAST</Text>
           <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
-          <Text style={styles.signTitle}>{sign.toUpperCase()}</Text>
         </View>
         <View style={styles.mainContent}>
+          <Text style={styles.signTitle}>{sign.toUpperCase()}</Text>
           <Text style={styles.hookText}>{hook}</Text>
-
           <View style={styles.divider} />
-
           <Text style={styles.mainRoast}>{renderInlineMarkdown(roast)}</Text>
         </View>
         <View style={styles.adviceBox}>
@@ -90,7 +88,9 @@ const styles = StyleSheet.create({
   card: {
     width: width * 0.9,
     aspectRatio: 9 / 16,
-    padding: 28,
+    paddingHorizontal: 28,
+    paddingTop: 28,
+    paddingBottom: 18,
     overflow: "hidden",
     elevation: 10,
     shadowColor: "#000",
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   flameBackground: {
     position: "absolute",
@@ -109,7 +109,6 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "flex-start",
-    // marginBottom: 20,
     zIndex: 1,
   },
   appTitle: {
@@ -123,13 +122,12 @@ const styles = StyleSheet.create({
     color: COLORS.void,
     fontSize: 48,
     fontWeight: "400",
-    marginTop: 5,
+    marginVertical: 5,
   },
   dateText: {
     color: COLORS.void,
     fontSize: 12,
     fontWeight: "400",
-    // marginTop: 4,
     opacity: 0.7,
   },
   mainContent: {
@@ -144,7 +142,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "left",
     fontStyle: "italic",
-    lineHeight: 28,
+    lineHeight: 20,
   },
   divider: {
     width: "40%",
@@ -156,12 +154,13 @@ const styles = StyleSheet.create({
   mainRoast: {
     color: COLORS.void,
     fontSize: 14,
-    lineHeight: 24,
+    lineHeight: 22,
     textAlign: "left",
     fontWeight: "500",
   },
   adviceBox: {
-    padding: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     backgroundColor: COLORS.void,
     width: "100%",
     zIndex: 1,
