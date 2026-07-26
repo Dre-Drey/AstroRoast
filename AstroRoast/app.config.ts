@@ -34,13 +34,6 @@ export default ({ config }: ConfigContext): ExpoConfigWithAlternateIcons => ({
       usesNonExemptEncryption: false,
     },
     associatedDomains: [],
-    infoPlist: {
-      // No tracking at all in this app
-      NSUserTrackingUsageDescription:
-        "AstroRoast does not track you or collect any personal data.",
-      NSFaceIDUsageDescription:
-        "AstroRoast uses Face ID to secure your session.",
-    },
     alternateIcons: {
       aries: { image: "./assets/icons/ios/zodiac/aries.png" },
       taurus: { image: "./assets/icons/ios/zodiac/taurus.png" },
