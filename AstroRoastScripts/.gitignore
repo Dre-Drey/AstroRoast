@@ -2,6 +2,7 @@
 
 # Prompts
 roasts/prompts.ts
+roasts/style.ts
 
 # dependencies
 node_modules/

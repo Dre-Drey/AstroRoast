@@ -182,7 +182,12 @@ function AppNavigator() {
               backgroundColor: "rgba(14, 14, 14, 0.7)",
               borderTopWidth: 0,
               elevation: 0,
-              height: 80,
+              height: 88,
+              paddingTop: 8,
+              paddingBottom: 12,
+            },
+            tabBarItemStyle: {
+              paddingVertical: 8,
             },
             tabBarBackground: () => (
               <BlurView
