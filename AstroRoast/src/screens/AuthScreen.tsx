@@ -379,7 +379,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Text
                   style={styles.termsLink}
                   onPress={() =>
-                    openTerms("https://astro-roast.vercel.app/terms.html")
+                    openTerms("https://www.astroroast.app/terms.html")
                   }
                   accessibilityRole="link"
                   accessibilityLabel="Open general terms of use"
@@ -391,7 +391,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Text
                   style={styles.termsLink}
                   onPress={() =>
-                    openTerms("https://astro-roast.vercel.app/privacy.html")
+                    openTerms("https://www.astroroast.app/privacy.html")
                   }
                   accessibilityRole="link"
                   accessibilityLabel="Open privacy policy"
