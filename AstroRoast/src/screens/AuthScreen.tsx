@@ -5,12 +5,12 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Alert,
+  ScrollView,
   Switch,
   Linking,
 } from "react-native";
+import { showAlert } from "../lib/alert";
 import { Eye, EyeOff } from "lucide-react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { supabase } from "../lib/supabase";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { AstroSign } from "../types/database";
@@ -50,10 +50,10 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       if (supported) {
         await Linking.openURL(url);
       } else {
-        Alert.alert("Link unavailable", url);
+        showAlert("Link unavailable", url);
       }
     } catch {
-      Alert.alert("Link unavailable", url);
+      showAlert("Link unavailable", url);
     }
   };
 
@@ -77,7 +77,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         if (error) {
           log.error("Error creating account:", error);
-          Alert.alert(
+          showAlert(
             "Creation Error",
             "We could not create your account right now. Check your connection and try again.",
           );
@@ -89,7 +89,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         if (notificationsEnabled && data.user?.id) {
           const token = await registerForPushNotificationsAsync();
           if (!token) {
-            Alert.alert(
+            showAlert(
               "Error",
               "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
             );
@@ -101,7 +101,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
             if (pushTokenError) {
               log.error("Error enabling notifications:", pushTokenError);
-              Alert.alert(
+              showAlert(
                 "Error",
                 "An error occurred while updating your notification settings. Please try again.",
               );
@@ -109,7 +109,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           }
         }
 
-        Alert.alert("Success", "Check your emails to confirm your account!");
+        showAlert("Success", "Check your emails to confirm your account!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -118,7 +118,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         if (error) {
           log.error("Error logging in:", error);
-          Alert.alert(
+          showAlert(
             "Login Error",
             "We could not log you in right now. Check your connection and try again.",
           );
@@ -130,12 +130,12 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   }
 
   return (
-    <KeyboardAwareScrollView
+    <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
-      extraScrollHeight={30}
-      enableOnAndroid={true}
+      // extraScrollHeight={30}
+      // enableOnAndroid={true}
     >
       <View style={styles.title}>
         <Text style={styles.displayMd}>ASTRO ROAST</Text>
@@ -427,7 +427,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           {loading ? "PREPARING THE SALT..." : "GET ROASTED"}
         </Text>
       </TouchableOpacity>
-    </KeyboardAwareScrollView>
+    </ScrollView>
   );
 };
 

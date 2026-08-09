@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   StyleSheet,
   Switch,
   Text,
@@ -16,6 +15,7 @@ import { registerForPushNotificationsAsync } from "../lib/notifications";
 import { log } from "../lib/log";
 import { useProfileQuery } from "../hooks/useProfileQuery";
 import { useQueryClient } from "@tanstack/react-query";
+import { showAlert } from "../lib/alert";
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   const { session, signOut, loading } = useAuth();
@@ -38,7 +38,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
+    showAlert(
       "SUPPRESSION",
       "Are you sure you want to delete your account? This action is irreversible.",
       [
@@ -49,7 +49,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
           onPress: async () => {
             try {
               if (!session?.user) {
-                Alert.alert("Error", "User not authenticated.");
+                showAlert("Error", "User not authenticated.");
                 return;
               }
               const response = await fetch(
@@ -64,7 +64,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
               );
               if (response.ok) {
                 await supabase.auth.signOut();
-                Alert.alert(
+                showAlert(
                   "Account Deleted",
                   "Your account has been successfully deleted.",
                 );
@@ -75,14 +75,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
                   "Response is not ok - error deleting account:",
                   errorData,
                 );
-                Alert.alert(
+                showAlert(
                   "Error",
                   "An error occurred while deleting your account. Please try again.",
                 );
               }
             } catch (error) {
               log.error("Error deleting account:", error);
-              Alert.alert(
+              showAlert(
                 "Error",
                 "An error occurred while deleting your account. Please try again.",
               );
@@ -103,7 +103,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
         // Register for push notifications and get the token
         const token = await registerForPushNotificationsAsync();
         if (!token) {
-          Alert.alert(
+          showAlert(
             "Error",
             "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
           );
@@ -138,7 +138,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
         queryKey: ["profile", session.user.id],
       });
     } catch (error) {
-      Alert.alert(
+      showAlert(
         "Error",
         "An error occurred while updating your notification settings. Please try again.",
       );

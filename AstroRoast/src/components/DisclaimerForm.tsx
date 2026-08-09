@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Alert,
   View,
   Text,
   TouchableOpacity,
@@ -11,6 +10,8 @@ import { COLORS } from "../constants/theme";
 import { submitRoastReport } from "../actions";
 import type { DailyRoast } from "../types/database";
 import { log } from "../lib/log";
+import { Platform } from "react-native";
+import { showAlert } from "../lib/alert";
 
 export default function DisclaimerForm({
   data,
@@ -28,7 +29,7 @@ export default function DisclaimerForm({
 
     const trimmedMessage = reportMessage.trim();
     if (!trimmedMessage) {
-      Alert.alert(
+      showAlert(
         "Missing message",
         "Please tell us what felt off so we can review this roast.",
       );
@@ -40,13 +41,13 @@ export default function DisclaimerForm({
       await submitRoastReport({ roast: data, message: trimmedMessage });
       setReportMessage("");
       setReportOpen(false);
-      Alert.alert(
+      showAlert(
         "Report received",
         "Thanks. We linked your message to this roast and saved it for review.",
       );
     } catch (reportError) {
       log.error("Error submitting roast report:", reportError);
-      Alert.alert(
+      showAlert(
         "Could not send report",
         "We could not send your report right now. Check your connection and try again.",
       );
@@ -104,7 +105,9 @@ export default function DisclaimerForm({
             disabled={reportSubmitting}
             accessibilityRole="button"
             accessibilityState={{ disabled: reportSubmitting }}
-            accessibilityLabel={reportSubmitting ? "Sending report" : "Send report"}
+            accessibilityLabel={
+              reportSubmitting ? "Sending report" : "Send report"
+            }
             accessibilityHint="Submits your report for review."
           >
             <Text style={styles.reportButtonText}>
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    fontSize: 14,
+    fontSize: Platform.OS === "web" ? 16 : 14,
     lineHeight: 20,
   },
   reportHint: {

@@ -4,7 +4,6 @@ import { captureRef } from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { File, Paths } from "expo-file-system";
 import {
-  Button,
   StyleSheet,
   Text,
   View,
@@ -23,6 +22,7 @@ import { renderInlineMarkdown } from "../lib/renderInlineMarkdown";
 import DisclaimerForm from "../components/DisclaimerForm";
 import { log } from "../lib/log";
 import { useProfileQuery } from "../hooks/useProfileQuery";
+import { showAlert } from "../lib/alert";
 
 export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();
@@ -140,7 +140,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
 
       // 5. Check if sharing is available
       if (!(await Sharing.isAvailableAsync())) {
-        alert("Le partage n'est pas disponible sur votre appareil");
+        showAlert("Le partage n'est pas disponible sur votre appareil");
         return;
       }
 

@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   TextInput,
-  Button,
-  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,11 +10,14 @@ import { Eye, EyeOff } from "lucide-react-native";
 import { supabase } from "../lib/supabase";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { COLORS } from "../constants/theme";
+import { showAlert } from "../lib/alert";
 
 export default function NewPasswordScreen({
   onComplete,
+  tokenHash,
 }: {
   onComplete: () => void;
+  tokenHash: string | null;
 }) {
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function NewPasswordScreen({
 
   const handleUpdatePassword = async () => {
     if (newPassword.length < 10) {
-      Alert.alert("Error", "The password must be at least 10 characters long.");
+      showAlert("Error", "The password must be at least 10 characters long.");
       return;
     }
 
@@ -35,12 +36,18 @@ export default function NewPasswordScreen({
     setLoading(false);
 
     if (error) {
-      Alert.alert("Error", error.message);
+      showAlert("Error", error.message);
     } else {
-      Alert.alert("Success!", "Your password has been updated.");
+      showAlert("Success!", "Your password has been updated.");
       onComplete();
     }
   };
+
+  useEffect(() => {
+    if (tokenHash) {
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" });
+    }
+  }, [tokenHash]);
 
   return (
     <KeyboardAwareScrollView

@@ -3,13 +3,13 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Alert,
   StyleSheet,
   Text,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { supabase } from "../lib/supabase";
 import { COLORS } from "../constants/theme";
+import { showAlert } from "../lib/alert";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -28,9 +28,9 @@ export default function ForgotPasswordScreen() {
     setLoading(false);
 
     if (error) {
-      Alert.alert("Error", error.message);
+      showAlert("Error", error.message);
     } else {
-      Alert.alert(
+      showAlert(
         "Check your emails",
         "A password reset link has been sent to your email.",
       );

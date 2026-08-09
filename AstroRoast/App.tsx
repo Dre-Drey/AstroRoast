@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Linking } from "react-native";
+import { Linking, Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -26,34 +26,23 @@ import { AuthProvider } from "./src/contexts/AuthContext";
 import { SplashScreen } from "./src/screens/SplashScreen";
 import NewPasswordScreen from "./src/screens/NewPasswordScreen";
 import ForgotPasswordScreen from "./src/screens/ForgotPasswordScreen";
+import { AuthCallbackScreen } from "./src/screens/AuthCallbackScreen";
 import { useAuth } from "./src/contexts/AuthContext";
 import { RootTabParamList } from "./src/types/navigation";
 
-import {
-  handleDeepLinkEmailConfirmation,
-  isEmailConfirmationUrl,
-  handlePasswordResetUrl,
-  isPasswordResetUrl,
-} from "./src/lib/deepLink";
 import * as Sentry from "@sentry/react-native";
+
+if (Platform.OS === "web") {
+  document.body.style.overflow = "auto";
+}
 
 Sentry.init({
   dsn: "https://39759842472ad82ccf0ca9023b84d3a1@o4511631548416000.ingest.de.sentry.io/4511631555362896",
-
-  // Adds more context data to events (IP address, cookies, user, etc.)
-  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
   sendDefaultPii: true,
-
-  // Enable Logs
   enableLogs: true,
-
-  // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [Sentry.mobileReplayIntegration()],
-
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // spotlight: __DEV__,
 });
 
 const queryClient = new QueryClient();
@@ -75,6 +64,17 @@ const THEME = {
     primary: "#8c4f2b",
   },
 };
+
+// Extract token_hash and type from the URL query parameters
+function parseAuthParams(url: string) {
+  const queryString = url.split("?")[1];
+  if (!queryString) return { token_hash: null, type: null };
+  const params = new URLSearchParams(queryString);
+  return {
+    token_hash: params.get("token_hash"),
+    type: params.get("type"),
+  };
+}
 
 export default Sentry.wrap(function App() {
   return (
@@ -98,59 +98,61 @@ function AppNavigator() {
     keyof RootTabParamList | null
   >(null);
   const [isRecoveringPassword, setIsRecoveringPassword] = useState(false);
+  const [recoveryTokenHash, setRecoveryTokenHash] = useState<string | null>(
+    null,
+  );
 
+  const linking = {
+    prefixes: ["astroroast://", "https://app.astroroast.app"],
+    config: {
+      screens: {
+        AuthCallback: "auth/callback",
+        Burn: "burn",
+        Profile: "profile",
+        ForgotPassword: "forgot-password",
+      },
+    },
+  };
+
+  // Détection précoce du recovery, AVANT que le NavigationContainer ne
+  // monte quoi que ce soit — évite que l'établissement de session par
+  // verifyOtp ne fasse basculer l'app vers l'écran connecté trop tôt.
   useEffect(() => {
-    const handleInitialURL = async () => {
+    const checkInitialUrl = async () => {
       const url = await Linking.getInitialURL();
       if (!url) return;
-
-      if (url && isEmailConfirmationUrl(url)) {
-        await handleDeepLinkEmailConfirmation(url);
-      }
-
-      if (url && isPasswordResetUrl(url)) {
+      const { token_hash, type } = parseAuthParams(url);
+      if (type === "recovery" && token_hash) {
+        setRecoveryTokenHash(token_hash);
         setIsRecoveringPassword(true);
-        await handlePasswordResetUrl(url);
       }
     };
+    void checkInitialUrl();
 
-    void handleInitialURL();
-  }, []);
-
-  useEffect(() => {
-    const subscription = Linking.addEventListener("url", async ({ url }) => {
-      if (isEmailConfirmationUrl(url)) {
-        void handleDeepLinkEmailConfirmation(url);
-      }
-      if (isPasswordResetUrl(url)) {
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      const { token_hash, type } = parseAuthParams(url);
+      if (type === "recovery" && token_hash) {
+        setRecoveryTokenHash(token_hash);
         setIsRecoveringPassword(true);
-        await handlePasswordResetUrl(url);
       }
     });
 
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
     const notificationSubscription =
       Notifications.addNotificationResponseReceivedListener(() => {
-        if (loading) {
-          return;
-        }
-
+        if (loading) return;
         setPendingRoute(session ? "Burn" : "Auth");
       });
 
-    return () => {
-      subscription.remove();
-      notificationSubscription.remove();
-    };
+    return () => notificationSubscription.remove();
   }, [loading, session]);
 
   useEffect(() => {
-    if (!navigationReady || !pendingRoute || !navigationRef.isReady()) {
-      return;
-    }
-    if (isRecoveringPassword) {
-      return;
-    }
-
+    if (!navigationReady || !pendingRoute || !navigationRef.isReady()) return;
+    if (isRecoveringPassword) return;
     navigationRef.navigate(pendingRoute);
     setPendingRoute(null);
   }, [navigationReady, pendingRoute]);
@@ -161,12 +163,20 @@ function AppNavigator() {
 
   if (isRecoveringPassword) {
     return (
-      <NewPasswordScreen onComplete={() => setIsRecoveringPassword(false)} />
+      <NewPasswordScreen
+        tokenHash={recoveryTokenHash}
+        onComplete={() => {
+          setIsRecoveringPassword(false);
+          setRecoveryTokenHash(null);
+        }}
+      />
     );
   }
+
   return (
     <NavigationContainer
       ref={navigationRef}
+      linking={linking}
       theme={THEME}
       onReady={() => setNavigationReady(true)}
     >
@@ -186,9 +196,7 @@ function AppNavigator() {
               paddingTop: 8,
               paddingBottom: 12,
             },
-            tabBarItemStyle: {
-              paddingVertical: 8,
-            },
+            tabBarItemStyle: { paddingVertical: 8 },
             tabBarBackground: () => (
               <BlurView
                 tint="dark"
@@ -229,6 +237,7 @@ function AppNavigator() {
             name="ForgotPassword"
             component={ForgotPasswordScreen}
           />
+          <Stack.Screen name="AuthCallback" component={AuthCallbackScreen} />
         </Stack.Navigator>
       )}
     </NavigationContainer>
