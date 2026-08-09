@@ -1,22 +1,23 @@
 import * as Sharing from "expo-sharing";
-import { File, Paths } from "expo-file-system";
 import { showAlert } from "../lib/alert";
 
+import * as FileSystem from "expo-file-system/legacy";
+
 export async function shareOnNative(tempUri: string) {
-  const sourceFile = new File(tempUri);
   const fileName = `astro_daily_roast_${Date.now()}.png`;
-  const destinationFile = new File(Paths.document, fileName);
-  sourceFile.copy(destinationFile);
+  const destinationUri = FileSystem.documentDirectory + fileName;
+
+  await FileSystem.copyAsync({
+    from: tempUri,
+    to: destinationUri,
+  });
 
   if (!(await Sharing.isAvailableAsync())) {
-    showAlert(
-      "Sharing is not available",
-      "Sharing is not available on this device.",
-    );
+    showAlert("Le partage n'est pas disponible sur votre appareil");
     return;
   }
 
-  await Sharing.shareAsync(destinationFile.uri, {
+  await Sharing.shareAsync(destinationUri, {
     mimeType: "image/png",
     dialogTitle: "Share your Daily Roast",
     UTI: "public.png",
