@@ -1,8 +1,6 @@
 import React, { useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { captureRef } from "react-native-view-shot";
-import * as Sharing from "expo-sharing";
-import { File, Paths } from "expo-file-system";
 import {
   StyleSheet,
   Text,
@@ -23,6 +21,8 @@ import DisclaimerForm from "../components/DisclaimerForm";
 import { log } from "../lib/log";
 import { useProfileQuery } from "../hooks/useProfileQuery";
 import { showAlert } from "../lib/alert";
+import { Platform } from "react-native";
+import { shareOnNative, shareOnWeb } from "../lib/share";
 
 export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   const { session, loading } = useAuth();
@@ -127,32 +127,14 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
         format: "png",
         quality: 1,
       });
-
-      // 2. Create a File instance pointing to the temporary location
-      const sourceFile = new File(tempUri);
-
-      // 3. Create a destination File in the documents directory
-      const fileName = `astro_daily_roast_${Date.now()}.png`;
-      const destinationFile = new File(Paths.document, fileName);
-
-      // 4. Copy the file from temp to permanent location
-      sourceFile.copy(destinationFile);
-
-      // 5. Check if sharing is available
-      if (!(await Sharing.isAvailableAsync())) {
-        showAlert("Le partage n'est pas disponible sur votre appareil");
-        return;
+      if (Platform.OS === "web") {
+        await shareOnWeb(tempUri);
+      } else {
+        await shareOnNative(tempUri);
       }
-
-      // 6. Share the image using the system's share dialog
-      await Sharing.shareAsync(destinationFile.uri, {
-        mimeType: "image/png",
-        dialogTitle: "Share your Daily Roast",
-        UTI: "public.png", // for iOS
-      });
     } catch (error) {
       log.error("Error sharing the card:", error);
-      alert("Oups, something wrong happened :( Try again later.");
+      showAlert("Oups", "Something went wrong. Try again later.");
     }
   };
 
