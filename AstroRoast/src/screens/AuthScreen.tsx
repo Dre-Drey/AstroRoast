@@ -134,8 +134,6 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       style={styles.container}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
-      // extraScrollHeight={30}
-      // enableOnAndroid={true}
     >
       <View style={styles.title}>
         <Text style={styles.displayMd}>ASTRO ROAST</Text>
@@ -432,7 +430,13 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.void, marginBottom: 40 },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.void,
+    marginBottom: 40,
+    maxWidth: 600,
+    alignSelf: "center",
+  },
   content: { padding: 20, paddingTop: 40, marginBottom: 40 },
   title: {
     marginBottom: 40,

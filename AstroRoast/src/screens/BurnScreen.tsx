@@ -134,7 +134,10 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
       }
     } catch (error) {
       log.error("Error sharing the card:", error);
-      showAlert("Oups", "Something went wrong. Try again later.");
+      showAlert(
+        "Oups",
+        `An error occurred while trying to share the roast: ${error}`,
+      );
     }
   };
 
@@ -334,7 +337,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 1,
   },
-  container: { flex: 1 },
+  container: { flex: 1, maxWidth: 600, alignSelf: "center" },
   content: { padding: 20, paddingBottom: 120 },
   title: {
     marginBottom: 40,

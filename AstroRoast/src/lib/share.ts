@@ -46,15 +46,30 @@ export async function shareOnWeb(tempUri: string) {
       });
       return;
     } catch (shareError: any) {
-      // The user canceled the share — not a real error, we just stop here.
-      if (shareError?.name === "AbortError") return;
+      if (shareError?.name === "AbortError") return; // annulation volontaire
+      if (shareError?.name === "NotAllowedError") {
+        // Le navigateur a "perdu" le geste utilisateur (délai de capture trop long).
+        // On bascule silencieusement sur le téléchargement plutôt que de faire échouer le partage.
+        await downloadImage(tempUri, fileName);
+        return;
+      }
       throw shareError;
     }
   }
+  await downloadImage(tempUri, fileName);
+}
+async function downloadImage(uri: string, fileName: string) {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+  const blobUrl = URL.createObjectURL(blob);
 
-  // Fallback desktop : direct download of the image file
   const link = document.createElement("a");
-  link.href = tempUri;
+  link.href = blobUrl;
   link.download = fileName;
+  link.rel = "noopener";
+  link.style.display = "none";
+  document.body.appendChild(link);
   link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
 }

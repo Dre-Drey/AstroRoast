@@ -180,7 +180,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
           </TouchableOpacity>
         </View>
       ) : session ? (
-        <>
+        <View style={styles.center}>
           <View style={styles.header}>
             <Text style={styles.displayMd}>PROFIL</Text>
             <Text style={styles.labelMd}>[ID_ENTITY_CONFIRMED]</Text>
@@ -243,7 +243,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
               <Text style={styles.deleteText}>DELETE_ACCOUNT</Text>
             </TouchableOpacity>
           </View>
-        </>
+        </View>
       ) : (
         <View style={styles.center}>
           <Text style={styles.labelMd}>CONNECT_TO_ACCESS_PROFILE</Text>
@@ -266,6 +266,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.void,
     justifyContent: "center",
     alignItems: "center",
+    maxWidth: 600,
+    alignSelf: "center",
     padding: 20,
   },
   displayMd: {
