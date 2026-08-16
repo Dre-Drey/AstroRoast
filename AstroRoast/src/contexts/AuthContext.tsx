@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (session?.user) {
           syncPushToken(session.user.id);
           if (isWeb) {
-            import("../lib/notifications.web")
+            import("../lib/notificationsWeb")
               .then(({ registerForWebPush }) =>
                 registerForWebPush(session.user.id),
               )
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       ) {
         syncPushToken(session.user.id);
         if (isWeb) {
-          import("../lib/notifications.web")
+          import("../lib/notificationsWeb")
             .then(({ registerForWebPush }) =>
               registerForWebPush(session.user.id),
             )
@@ -96,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (isWeb && session?.user) {
       try {
         const { cleanUpWebPushSubscriptions } =
-          await import("../lib/notifications.web");
+          await import("../lib/notificationsWeb");
         await cleanUpWebPushSubscriptions();
       } catch (err) {
         console.error("cleanUpWebPushSubscriptions failed:", err);

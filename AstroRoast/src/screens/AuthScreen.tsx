@@ -94,7 +94,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           if (isWeb) {
             try {
               const { registerForWebPush } =
-                await import("../lib/notifications.web");
+                await import("../lib/notificationsWeb");
               const res = await registerForWebPush(data.user.id);
               if (!res || res.success === false) {
                 showAlert(

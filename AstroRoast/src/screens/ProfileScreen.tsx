@@ -106,7 +106,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
       if (isWeb) {
         // Web (Pusher Beams) flow: register/unregister interests
         const { registerForWebPush, unsubscribeFromWebPush } =
-          await import("../lib/notifications.web");
+          await import("../lib/notificationsWeb");
 
         if (value) {
           const res = await registerForWebPush(session.user.id);
