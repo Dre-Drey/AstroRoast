@@ -12,6 +12,10 @@ import { supabase } from "../lib/supabase";
 import { ProfileScreenProps } from "../types/navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { registerForPushNotificationsAsync } from "../lib/notifications";
+const isWeb =
+  typeof window !== "undefined" &&
+  typeof navigator !== "undefined" &&
+  "serviceWorker" in navigator;
 import { log } from "../lib/log";
 import { useProfileQuery } from "../hooks/useProfileQuery";
 import { useQueryClient } from "@tanstack/react-query";
@@ -99,40 +103,62 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
     setUpdatingNotifications(true);
 
     try {
-      if (value) {
-        // Register for push notifications and get the token
-        const token = await registerForPushNotificationsAsync();
-        if (!token) {
-          showAlert(
-            "Error",
-            "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
-          );
-          setUpdatingNotifications(false);
-          return;
-        }
+      if (isWeb) {
+        // Web (Pusher Beams) flow: register/unregister interests
+        const { registerForWebPush, unsubscribeFromWebPush } =
+          await import("../lib/notifications.web");
 
-        const { error } = await supabase
-          .from("profiles")
-          .update({ expo_push_token: token })
-          .eq("id", session.user.id);
-
-        if (error) {
-          log.error("Error enabling notifications:", error);
-          throw new Error("Failed to enable notifications");
+        if (value) {
+          const res = await registerForWebPush(session.user.id);
+          if (!res || res.success === false) {
+            showAlert(
+              "Error",
+              "Failed to enable web notifications. Please allow notifications in your browser settings.",
+            );
+            setUpdatingNotifications(false);
+            return;
+          }
+          setNotificationsEnabled(true);
+        } else {
+          await unsubscribeFromWebPush(session.user.id);
+          setNotificationsEnabled(false);
         }
-        setNotificationsEnabled(true);
-      }
-      if (!value) {
-        const { error } = await supabase
-          .from("profiles")
-          .update({ expo_push_token: null })
-          .eq("id", session.user.id);
+      } else {
+        if (value) {
+          // Register for push notifications and get the token
+          const token = await registerForPushNotificationsAsync();
+          if (!token) {
+            showAlert(
+              "Error",
+              "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
+            );
+            setUpdatingNotifications(false);
+            return;
+          }
 
-        if (error) {
-          log.error("Error disabling notifications:", error);
-          throw new Error("Failed to disable notifications");
+          const { error } = await supabase
+            .from("profiles")
+            .update({ expo_push_token: token })
+            .eq("id", session.user.id);
+
+          if (error) {
+            log.error("Error enabling notifications:", error);
+            throw new Error("Failed to enable notifications");
+          }
+          setNotificationsEnabled(true);
         }
-        setNotificationsEnabled(false);
+        if (!value) {
+          const { error } = await supabase
+            .from("profiles")
+            .update({ expo_push_token: null })
+            .eq("id", session.user.id);
+
+          if (error) {
+            log.error("Error disabling notifications:", error);
+            throw new Error("Failed to disable notifications");
+          }
+          setNotificationsEnabled(false);
+        }
       }
       await queryClient.invalidateQueries({
         queryKey: ["profile", session.user.id],

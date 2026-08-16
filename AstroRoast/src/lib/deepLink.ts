@@ -48,4 +48,6 @@ export const handlePasswordResetUrl = async (urlStr: string) => {
       console.error("Erreur lors de la validation du reset:", error.message);
     }
   }
+
+  return token_hash;
 };

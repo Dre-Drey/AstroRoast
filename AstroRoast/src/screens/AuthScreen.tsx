@@ -16,6 +16,10 @@ import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { AstroSign } from "../types/database";
 import { setAppIcon } from "../lib/iconManager";
 import { registerForPushNotificationsAsync } from "../lib/notifications";
+const isWeb =
+  typeof window !== "undefined" &&
+  typeof navigator !== "undefined" &&
+  "serviceWorker" in navigator;
 import { log } from "../lib/log";
 
 export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -87,24 +91,44 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         await setAppIcon(selectedSign);
 
         if (notificationsEnabled && data.user?.id) {
-          const token = await registerForPushNotificationsAsync();
-          if (!token) {
-            showAlert(
-              "Error",
-              "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
-            );
-          } else {
-            const { error: pushTokenError } = await supabase
-              .from("profiles")
-              .update({ expo_push_token: token })
-              .eq("id", data.user.id);
-
-            if (pushTokenError) {
-              log.error("Error enabling notifications:", pushTokenError);
+          if (isWeb) {
+            try {
+              const { registerForWebPush } =
+                await import("../lib/notifications.web");
+              const res = await registerForWebPush(data.user.id);
+              if (!res || res.success === false) {
+                showAlert(
+                  "Error",
+                  "Failed to enable web notifications. Please allow notifications in your browser settings.",
+                );
+              }
+            } catch (err) {
+              log.error("Error enabling web notifications:", err);
               showAlert(
                 "Error",
-                "An error occurred while updating your notification settings. Please try again.",
+                "An error occurred while enabling web notifications. Please try again.",
               );
+            }
+          } else {
+            const token = await registerForPushNotificationsAsync();
+            if (!token) {
+              showAlert(
+                "Error",
+                "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
+              );
+            } else {
+              const { error: pushTokenError } = await supabase
+                .from("profiles")
+                .update({ expo_push_token: token })
+                .eq("id", data.user.id);
+
+              if (pushTokenError) {
+                log.error("Error enabling notifications:", pushTokenError);
+                showAlert(
+                  "Error",
+                  "An error occurred while updating your notification settings. Please try again.",
+                );
+              }
             }
           }
         }
