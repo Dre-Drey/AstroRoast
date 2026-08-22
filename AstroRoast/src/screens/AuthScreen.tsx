@@ -13,6 +13,7 @@ import { showAlert } from "../lib/alert";
 import { Eye, EyeOff } from "lucide-react-native";
 import { supabase } from "../lib/supabase";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
+import { sharedLayout, sharedTypography } from "../styles/common";
 import { AstroSign } from "../types/database";
 import { setAppIcon } from "../lib/iconManager";
 import { registerForPushNotificationsAsync } from "../lib/notifications";
@@ -155,19 +156,20 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
+      style={sharedLayout.container}
+      contentContainerStyle={sharedLayout.content}
+      bounces={true}
+      accessibilityLabel="Auth screen"
     >
-      <View style={styles.title}>
-        <Text style={styles.displayMd}>ASTRO ROAST</Text>
+      <View style={sharedTypography.title}>
+        <Text style={sharedTypography.displayMd}>ASTRO ROAST</Text>
       </View>
-      <View style={styles.header}>
-        <Text style={styles.displayLg}>
+      <View style={sharedLayout.header}>
+        <Text style={sharedTypography.displayLg}>
           STARS DON’T GUIDE YOU.
           {"\n"}THEY JUDGE YOU.
         </Text>
-        <Text style={styles.labelLg}>
+        <Text style={sharedTypography.labelLg}>
           [ Stop looking for guidance. Start looking for the truth.{"\n"}
           Join thousands of souls burned by the stars everyday. ]
         </Text>
@@ -177,7 +179,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <View style={{ marginBottom: 20 }}>
           <Text
             style={[
-              styles.labelLg,
+              sharedTypography.labelLg,
               { color: COLORS.primary, marginBottom: 10 },
             ]}
           >
@@ -215,7 +217,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>EMAIL_ADDRESS</Text>
+          <Text style={sharedTypography.inputLabel}>EMAIL_ADDRESS</Text>
           <TextInput
             onChangeText={setEmail}
             value={email}
@@ -226,25 +228,25 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             autoComplete="email"
             textContentType="emailAddress"
             returnKeyType="next"
-            style={styles.input}
+            style={sharedTypography.input}
             accessibilityLabel="Email address"
             accessibilityHint="Enter the email address for your account."
           />
         </View>
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>PASSWORD</Text>
+          <Text style={sharedTypography.inputLabel}>PASSWORD</Text>
           <View style={styles.passwordFieldRow}>
             <TextInput
               onChangeText={setPassword}
               value={password}
               secureTextEntry={!showPassword}
-              placeholder="Password"
+              placeholder="password"
               placeholderTextColor="#a7a7a7"
               autoCapitalize="none"
               autoComplete="password"
               textContentType="password"
               returnKeyType={isSignUp ? "next" : "done"}
-              style={[styles.input, styles.passwordInput]}
+              style={[sharedTypography.input, styles.passwordInput]}
               accessibilityLabel="Password"
               accessibilityHint="Enter your account password."
             />
@@ -288,7 +290,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         )}
         {isSignUp && (
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>CONFIRM_PASSWORD</Text>
+            <Text style={sharedTypography.inputLabel}>CONFIRM_PASSWORD</Text>
             <View style={styles.passwordFieldRow}>
               <TextInput
                 onChangeText={setConfirmPassword}
@@ -300,7 +302,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 autoComplete="password"
                 textContentType="password"
                 returnKeyType="done"
-                style={[styles.input, styles.passwordInput]}
+                style={[sharedTypography.input, styles.passwordInput]}
                 accessibilityLabel="Confirm password"
                 accessibilityHint="Re-enter the same password to confirm it."
               />
@@ -328,7 +330,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
       {isSignUp && (
         <>
-          <Text style={[styles.inputLabel, { marginBottom: 20 }]}>
+          <Text style={[sharedTypography.inputLabel, { marginBottom: 20 }]}>
             SELECT_YOUR_SIGN
           </Text>
 
@@ -350,8 +352,11 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 >
                   <Text
                     style={[
-                      styles.chipText,
-                      isSelected && { color: COLORS.void, fontWeight: "bold" },
+                      sharedTypography.chipText,
+                      isSelected && {
+                        color: COLORS.void,
+                        fontWeight: "bold",
+                      },
                     ]}
                   >
                     {sign.toUpperCase()}
@@ -371,7 +376,10 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
+              trackColor={{
+                false: COLORS.surfaceLow,
+                true: COLORS.primary,
+              }}
               thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
               ios_backgroundColor={COLORS.surfaceLow}
               accessibilityLabel="Enable notifications"
@@ -395,8 +403,8 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             >
               {termsAccepted && <Text style={styles.checkboxMark}>✓</Text>}
             </View>
-            <View style={styles.termsTextBlock}>
-              <Text style={styles.inputLabel}>
+            <View>
+              <Text style={[styles.inputLabel, { marginBottom: 0 }]}>
                 I accept the{" "}
                 <Text
                   style={styles.termsLink}
@@ -437,7 +445,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         </Text>
       )}
       <TouchableOpacity
-        style={[styles.button, loading && { opacity: 0.7 }]}
+        style={[sharedLayout.button, loading && { opacity: 0.7 }]}
         onPress={handleAuth}
         disabled={loading}
         accessibilityRole="button"
@@ -445,7 +453,7 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         accessibilityLabel={loading ? "Preparing the salt" : "Get roasted"}
         accessibilityHint="Submits the login or signup form."
       >
-        <Text style={styles.buttonText}>
+        <Text style={sharedLayout.buttonText}>
           {loading ? "PREPARING THE SALT..." : "GET ROASTED"}
         </Text>
       </TouchableOpacity>
@@ -454,57 +462,12 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.void,
-    marginBottom: 40,
-    maxWidth: 600,
-    alignSelf: "center",
-  },
-  content: { padding: 20, paddingTop: 40, marginBottom: 40 },
-  title: {
-    marginBottom: 40,
-    marginTop: 40,
-    borderBottomWidth: 4,
-    borderBottomColor: COLORS.primary,
-    width: "75%",
-  },
-  header: { marginBottom: 60 },
-  displayMd: {
-    color: COLORS.primary,
-    fontSize: 38,
-    lineHeight: 38,
-    fontWeight: "700",
-    letterSpacing: -1,
-  },
-  displayLg: {
-    color: COLORS.primary,
-    fontSize: 62,
-    lineHeight: 64,
-    fontWeight: "900",
-    letterSpacing: -2,
-    marginBottom: 10,
-  },
-  labelLg: {
-    color: COLORS.primary,
-    fontSize: 18,
-    fontWeight: "600",
-    letterSpacing: 2,
-    marginBottom: 8,
-  },
-  labelMd: {
-    color: COLORS.primary,
-    fontSize: 14,
-    fontWeight: "600",
-    letterSpacing: 2,
-  },
   inputGroup: { marginBottom: 25 },
   inputLabel: {
     color: COLORS.primary,
     fontSize: 12,
     letterSpacing: 1,
     marginBottom: 8,
-    fontFamily: "SpaceGrotesk_700Bold", // Si chargée
   },
   input: {
     borderBottomWidth: 2,
@@ -516,8 +479,6 @@ const styles = StyleSheet.create({
   passwordFieldRow: {
     flexDirection: "row",
     alignItems: "center",
-    borderBottomWidth: 2,
-    borderBottomColor: COLORS.outline,
   },
   passwordInput: {
     flex: 1,
@@ -545,7 +506,7 @@ const styles = StyleSheet.create({
   },
   termsRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 12,
     marginBottom: 40,
   },
@@ -566,10 +527,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "900",
     lineHeight: 16,
-  },
-  termsTextBlock: {
-    flex: 1,
-    color: COLORS.primary,
   },
   termsLink: {
     color: COLORS.primary,

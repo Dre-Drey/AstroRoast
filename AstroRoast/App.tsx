@@ -28,6 +28,7 @@ import NewPasswordScreen from "./src/screens/NewPasswordScreen";
 import ForgotPasswordScreen from "./src/screens/ForgotPasswordScreen";
 import { useAuth } from "./src/contexts/AuthContext";
 import { RootTabParamList } from "./src/types/navigation";
+import { COLORS } from "./src/constants/theme";
 
 import {
   handleDeepLinkEmailConfirmation,
@@ -68,11 +69,11 @@ const THEME = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: "#f6efe8",
-    card: "#fff8f1",
-    text: "#25170f",
-    border: "#e6d2c3",
-    primary: "#8c4f2b",
+    background: COLORS.void,
+    card: COLORS.surfaceLow,
+    text: COLORS.primary,
+    border: COLORS.void,
+    primary: COLORS.primary,
   },
 };
 
@@ -184,8 +185,8 @@ function AppNavigator() {
           screenOptions={{
             headerShown: false,
             tabBarShowLabel: false,
-            tabBarActiveTintColor: "#f6efe8",
-            tabBarInactiveTintColor: "#b99e8d",
+            tabBarActiveTintColor: COLORS.primary,
+            tabBarInactiveTintColor: COLORS.surfaceHighest,
             tabBarStyle: {
               position: "absolute",
               backgroundColor: "rgba(14, 14, 14, 0.7)",
@@ -230,7 +231,7 @@ function AppNavigator() {
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
-            cardStyle: { backgroundColor: "#0e0e0e" },
+            cardStyle: { backgroundColor: "#0e0e0e", flex: 1 },
           }}
         >
           <Stack.Screen name="Auth" component={AuthScreen} />
@@ -247,6 +248,6 @@ function AppNavigator() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#f6efe8",
+    backgroundColor: COLORS.void,
   },
 });

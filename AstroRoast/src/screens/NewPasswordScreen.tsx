@@ -10,6 +10,7 @@ import { Eye, EyeOff } from "lucide-react-native";
 import { supabase } from "../lib/supabase";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { COLORS } from "../constants/theme";
+import { sharedTypography, sharedLayout } from "../styles/common";
 import { showAlert } from "../lib/alert";
 
 export default function NewPasswordScreen({
@@ -51,15 +52,15 @@ export default function NewPasswordScreen({
 
   return (
     <KeyboardAwareScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
+      style={[sharedLayout.container, styles.container]}
+      contentContainerStyle={[sharedLayout.content, styles.content]}
       keyboardShouldPersistTaps="handled"
       extraScrollHeight={30}
       enableOnAndroid={true}
     >
-      <View style={styles.center}>
+      <View style={[sharedLayout.center, styles.center]}>
         <Text style={styles.displayLg}>Enter new password</Text>
-        <Text style={styles.labelMd}>
+        <Text style={sharedTypography.labelMd}>
           Enter your new password below. Make sure it's at least 10 characters
           long for security.
         </Text>
@@ -98,14 +99,14 @@ export default function NewPasswordScreen({
           <View />
           <TouchableOpacity
             style={[
-              styles.button,
+              sharedLayout.button,
               loading && { opacity: 0.7 },
               !newPassword && { opacity: 0.3 },
             ]}
             onPress={handleUpdatePassword}
             disabled={loading || !newPassword}
           >
-            <Text style={styles.buttonText}>
+            <Text style={sharedLayout.buttonText}>
               {loading ? "Updating..." : "Save password"}
             </Text>
           </TouchableOpacity>

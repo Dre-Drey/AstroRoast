@@ -13,6 +13,7 @@ import { Flame } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { fetchDailyRoast, fetchCosmicEvent } from "../actions";
 import { COLORS, SIGN_COLORS } from "../constants/theme";
+import { sharedLayout, sharedTypography } from "../styles/common";
 import { BurnScreenProps } from "../types/navigation";
 import ShareCard from "../components/ShareCard";
 import { useAuth } from "../contexts/AuthContext";
@@ -65,12 +66,12 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   if (loading || profileQuery.isLoading || isLoading) {
     return (
       <View
-        style={styles.center}
+        style={sharedLayout.center}
         accessible
         accessibilityLabel="Loading daily roast"
       >
         <ActivityIndicator color={COLORS.primary} />
-        <Text style={[styles.labelMd, { marginTop: 20 }]}>
+        <Text style={[sharedTypography.labelMd, { marginTop: 20 }]}>
           READING_STARS...
         </Text>
       </View>
@@ -79,19 +80,19 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
 
   if (isError) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.displayMd}>ROAST UNAVAILABLE</Text>
-        <Text style={styles.errorText}>
+      <View style={sharedLayout.center}>
+        <Text style={sharedTypography.displayMd}>ROAST UNAVAILABLE</Text>
+        <Text style={sharedTypography.errorText}>
           {(error as Error).message ||
             "We could not load today’s roast right now."}
         </Text>
         <TouchableOpacity
-          style={styles.retryButton}
+          style={sharedTypography.retryButton}
           onPress={() => {
             void refetchDailyRoast();
           }}
         >
-          <Text style={styles.retryButtonText}>RETRY</Text>
+          <Text style={sharedTypography.retryButtonText}>RETRY</Text>
         </TouchableOpacity>
       </View>
     );
@@ -99,19 +100,19 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
 
   if (profileQuery.isError) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.displayMd}>PROFILE OFFLINE</Text>
-        <Text style={styles.errorText}>
+      <View style={sharedLayout.center}>
+        <Text style={sharedTypography.displayMd}>PROFILE OFFLINE</Text>
+        <Text style={sharedTypography.errorText}>
           {(profileQuery.error as Error).message ||
             "We could not load your profile right now."}
         </Text>
         <TouchableOpacity
-          style={styles.retryButton}
+          style={sharedTypography.retryButton}
           onPress={() => {
             void profileQuery.refetch();
           }}
         >
-          <Text style={styles.retryButtonText}>RETRY</Text>
+          <Text style={sharedTypography.retryButtonText}>RETRY</Text>
         </TouchableOpacity>
       </View>
     );
@@ -143,7 +144,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
 
   return session ? (
     <>
-      <View style={styles.void}>
+      <View style={{ flex: 1, backgroundColor: COLORS.void }}>
         <LinearGradient
           colors={[signColor + "90", "rgba(0,0,0,0)"]}
           style={{
@@ -163,16 +164,16 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
           style={styles.flameBackground}
         />
         <ScrollView
-          style={styles.container}
-          contentContainerStyle={styles.content}
+          style={sharedLayout.container}
+          contentContainerStyle={sharedLayout.content}
           bounces={true}
           accessibilityLabel="Daily roast content"
         >
-          <View style={styles.header}>
-            <Text style={[styles.displayLg, { color: signColor }]}>
+          <View style={sharedLayout.header}>
+            <Text style={[sharedTypography.displayLg, { color: signColor }]}>
               {data?.sign?.toUpperCase()}
             </Text>
-            <Text style={styles.displayMd}>
+            <Text style={sharedTypography.labelLg}>
               {todayDate.toLocaleDateString("en-US", options)}
             </Text>
           </View>
@@ -227,7 +228,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
             </Text>
           </View>
           <View style={styles.adviceContainer}>
-            <Text style={[styles.labelMd, { color: signColor }]}>
+            <Text style={[sharedTypography.labelMd, { color: signColor }]}>
               COSMIC ADVICE
             </Text>
             <Text style={styles.adviceText}>{data?.advice}</Text>
@@ -240,7 +241,9 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
               accessibilityLabel="Share this roast"
               accessibilityHint="Opens the system share sheet for the daily roast image."
             >
-              <Text style={styles.secondaryButtonText}>SHARE THIS ROAST</Text>
+              <Text style={sharedTypography.secondaryButtonText}>
+                SHARE THIS ROAST
+              </Text>
             </TouchableOpacity>
             {/* Redirect to profile screen */}
             {!notificationEnabled && (
@@ -253,7 +256,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
               >
                 <Text
                   style={[
-                    styles.labelSm,
+                    sharedTypography.labelSm,
                     {
                       textAlign: "center",
                       color: COLORS.primary,
@@ -286,9 +289,9 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
       </View>
     </>
   ) : (
-    <View style={styles.center}>
-      <Text style={styles.displayMd}>NO SESSION</Text>
-      <Text style={styles.errorText}>
+    <View style={sharedLayout.center}>
+      <Text style={sharedTypography.displayMd}>NO SESSION</Text>
+      <Text style={sharedTypography.errorText}>
         Connecte-toi pour voir ton Daily Roast
       </Text>
     </View>
@@ -296,14 +299,6 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  void: { flex: 1, backgroundColor: COLORS.void },
-  center: {
-    flex: 1,
-    backgroundColor: COLORS.void,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
   errorText: {
     color: COLORS.primary,
     fontSize: 12,
@@ -352,28 +347,6 @@ const styles = StyleSheet.create({
     top: 20,
     zIndex: 0,
   },
-  displayMd: {
-    color: COLORS.primary,
-    fontSize: 38,
-    lineHeight: 38,
-    fontWeight: "700",
-    letterSpacing: -1,
-  },
-  header: { marginBottom: 40, marginTop: 40 },
-  labelMd: {
-    color: COLORS.primary,
-    fontSize: 16,
-    letterSpacing: 2,
-    fontWeight: "800",
-    marginBottom: 8,
-  },
-  labelSm: {
-    color: COLORS.primary,
-    fontSize: 10,
-    opacity: 0.75,
-    letterSpacing: 1,
-  },
-  displayLg: { fontSize: 64, fontWeight: "900", letterSpacing: -2 },
   dataGrid: {
     flexDirection: "column",
     backgroundColor: COLORS.surfaceLow,

@@ -2,6 +2,7 @@ export const COLORS = {
   void: "#0e0e0e", // Surface Level 0
   surfaceLow: "#161616", // Level 1
   surfaceHigh: "#222222", // Level 2
+  surfaceHighest: "#4a4949", // Level 3
   primary: "#f9f9f9", // Text principal / High contrast
   outline: "rgba(249, 249, 249, 0.2)", // Ghost border
 };

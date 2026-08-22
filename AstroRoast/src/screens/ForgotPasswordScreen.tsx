@@ -9,6 +9,7 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { supabase } from "../lib/supabase";
 import { COLORS } from "../constants/theme";
+import { sharedLayout, sharedTypography } from "../styles/common";
 import { showAlert } from "../lib/alert";
 
 export default function ForgotPasswordScreen() {
@@ -39,15 +40,15 @@ export default function ForgotPasswordScreen() {
 
   return (
     <KeyboardAwareScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
+      style={[sharedLayout.container, styles.container]}
+      contentContainerStyle={[sharedLayout.content, styles.content]}
       keyboardShouldPersistTaps="handled"
       extraScrollHeight={30}
       enableOnAndroid={true}
     >
-      <View style={styles.center}>
+      <View style={[sharedLayout.center, styles.center]}>
         <Text style={styles.displayLg}>Forgot your password ?</Text>
-        <Text style={styles.labelMd}>
+        <Text style={sharedTypography.labelMd}>
           Enter your email address and, if there is an account associated with
           it, we'll send you a link to reset your password.
         </Text>
@@ -71,14 +72,14 @@ export default function ForgotPasswordScreen() {
 
         <TouchableOpacity
           style={[
-            styles.button,
+            sharedLayout.button,
             loading && { opacity: 0.7 },
             !email && { opacity: 0.3 },
           ]}
           onPress={handleResetRequest}
           disabled={loading || !email}
         >
-          <Text style={styles.buttonText}>
+          <Text style={sharedLayout.buttonText}>
             {loading ? "Sending..." : "Receive reset link"}
           </Text>
         </TouchableOpacity>

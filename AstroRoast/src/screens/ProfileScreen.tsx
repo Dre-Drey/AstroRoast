@@ -6,8 +6,10 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ScrollView,
 } from "react-native";
 import { COLORS } from "../constants/theme";
+import { sharedLayout, sharedTypography } from "../styles/common";
 import { supabase } from "../lib/supabase";
 import { ProfileScreenProps } from "../types/navigation";
 import { useAuth } from "../contexts/AuthContext";
@@ -175,9 +177,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
 
   if (loading || profileQuery.isLoading) {
     return (
-      <View style={styles.center}>
+      <View style={sharedLayout.center}>
         <ActivityIndicator color={COLORS.primary} />
-        <Text style={[styles.labelMd, { marginTop: 20 }]}>
+        <Text style={[sharedTypography.labelMd, { marginTop: 20 }]}>
           ASKING FOR INFORMATION...
         </Text>
       </View>
@@ -185,9 +187,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={sharedLayout.container}
+      contentContainerStyle={[sharedLayout.content, styles.scrollContent]}
+      keyboardShouldPersistTaps="handled"
+    >
       {profileQuery.isError ? (
-        <View style={styles.center}>
+        <View style={sharedLayout.center}>
           <Text style={styles.displayMd}>PROFILE OFFLINE</Text>
           <Text style={[styles.labelMd, styles.errorMessage]}>
             {(profileQuery.error as Error).message ||
@@ -206,96 +212,99 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
           </TouchableOpacity>
         </View>
       ) : session ? (
-        <View style={styles.center}>
-          <View style={styles.header}>
-            <Text style={styles.displayMd}>PROFIL</Text>
-            <Text style={styles.labelMd}>[ID_ENTITY_CONFIRMED]</Text>
+        <View style={styles.sessionContent}>
+          <View style={sharedLayout.header}>
+            <Text style={sharedTypography.displayMd}>PROFIL</Text>
+            <Text style={sharedTypography.labelMd}>[ID_ENTITY_CONFIRMED]</Text>
           </View>
-
-          <View style={styles.infoSection}>
-            <View style={styles.infoBlock}>
-              <Text style={styles.labelSm}>EMAIL_LOG</Text>
-              <Text style={styles.infoValue}>
-                {session?.user.email?.toUpperCase()}
-              </Text>
-            </View>
-
-            <View style={styles.infoBlock}>
-              <Text style={styles.labelSm}>ASTRO_ASSIGNMENT</Text>
-              <Text style={styles.infoValue}>
-                {profile?.astro_sign.toUpperCase()}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.settingsSection}>
-            <View style={styles.settingRow}>
-              <View style={styles.settingTextBlock}>
-                <Text style={styles.settingTitle}>ENABLE_NOTIFICATIONS</Text>
+          <View style={styles.centeredBlock}>
+            <View style={styles.infoSection}>
+              <View>
+                <Text style={sharedTypography.labelSm}>EMAIL</Text>
+                <Text style={styles.infoValue}>
+                  {session?.user.email?.toUpperCase()}
+                </Text>
               </View>
-              <Switch
-                value={notificationsEnabled}
-                onValueChange={handleToggleNotifications}
-                disabled={updatingNotifications}
-                trackColor={{ false: COLORS.surfaceLow, true: COLORS.primary }}
-                thumbColor={notificationsEnabled ? COLORS.void : COLORS.primary}
-                ios_backgroundColor={COLORS.surfaceLow}
-                accessibilityLabel="Enable notifications"
-                accessibilityRole="switch"
-                accessibilityState={{ checked: notificationsEnabled }}
-                accessibilityHint="Turns profile notifications on or off."
-              />
+
+              <View>
+                <Text style={sharedTypography.labelSm}>ASTRO SIGN</Text>
+                <Text style={styles.infoValue}>
+                  {profile?.astro_sign.toUpperCase()}
+                </Text>
+              </View>
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingTextBlock}>
+                  <Text style={styles.settingTitle}>ENABLE NOTIFICATIONS</Text>
+                </View>
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={handleToggleNotifications}
+                  disabled={updatingNotifications}
+                  trackColor={{
+                    false: COLORS.surfaceLow,
+                    true: COLORS.primary,
+                  }}
+                  thumbColor={
+                    notificationsEnabled ? COLORS.void : COLORS.primary
+                  }
+                  ios_backgroundColor={COLORS.surfaceLow}
+                  accessibilityLabel="Enable notifications"
+                  accessibilityRole="switch"
+                  accessibilityState={{ checked: notificationsEnabled }}
+                  accessibilityHint="Turns profile notifications on or off."
+                />
+              </View>
             </View>
-          </View>
 
-          <View style={styles.actionSection}>
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={handleSignOut}
-              accessibilityRole="button"
-              accessibilityLabel="Log out"
-              accessibilityHint="Signs you out of the app."
-            >
-              <Text style={styles.logoutText}>LOGOUT_SESSION</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={handleDeleteAccount}
-              accessibilityRole="button"
-              accessibilityLabel="Delete account"
-              accessibilityHint="Permanently removes your account."
-            >
-              <Text style={styles.deleteText}>DELETE_ACCOUNT</Text>
-            </TouchableOpacity>
+            <View style={styles.actionSection}>
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleSignOut}
+                accessibilityRole="button"
+                accessibilityLabel="Log out"
+                accessibilityHint="Signs you out of the app."
+              >
+                <Text style={styles.logoutText}>LOGOUT SESSION</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDeleteAccount}
+                accessibilityRole="button"
+                accessibilityHint="Permanently removes your account."
+              >
+                <Text style={styles.deleteText}>DELETE ACCOUNT</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       ) : (
-        <View style={styles.center}>
-          <Text style={styles.labelMd}>CONNECT_TO_ACCESS_PROFILE</Text>
+        <View style={sharedLayout.center}>
+          <Text style={styles.labelMd}>CONNECT TO ACCESS PROFILE</Text>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: COLORS.void,
-    padding: 20,
     paddingTop: 80,
   },
-  header: { marginBottom: 60 },
-  center: {
+  scrollContent: {
+    flexGrow: 1,
+  },
+  sessionContent: {
     flex: 1,
-    backgroundColor: COLORS.void,
+    width: "100%",
+  },
+  centeredBlock: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    maxWidth: 600,
-    alignSelf: "center",
-    padding: 20,
+    width: "100%",
   },
+  header: { marginBottom: 60 },
   displayMd: {
     color: COLORS.primary,
     fontSize: 48,
@@ -320,12 +329,10 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: 4,
   },
-  infoSection: { marginBottom: 60 },
-  infoBlock: {
-    backgroundColor: COLORS.surfaceLow,
-    marginBottom: 12,
-  },
-  settingsSection: {
+  infoSection: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 20,
     marginBottom: 60,
   },
   settingRow: {
