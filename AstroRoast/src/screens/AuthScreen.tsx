@@ -16,7 +16,7 @@ import { COLORS, SIGN_COLORS } from "../constants/theme";
 import { sharedLayout, sharedTypography } from "../styles/common";
 import { AstroSign } from "../types/database";
 import { setAppIcon } from "../lib/iconManager";
-import { registerForPushNotificationsAsync } from "../lib/notifications";
+import { syncMobilePushSubscription } from "../lib/notifications";
 const isWeb =
   typeof window !== "undefined" &&
   typeof navigator !== "undefined" &&
@@ -111,25 +111,12 @@ export const AuthScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               );
             }
           } else {
-            const token = await registerForPushNotificationsAsync();
-            if (!token) {
+            const saved = await syncMobilePushSubscription(data.user.id);
+            if (!saved) {
               showAlert(
                 "Error",
-                "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
+                "An error occurred while updating your notification settings. Please try again.",
               );
-            } else {
-              const { error: pushTokenError } = await supabase
-                .from("profiles")
-                .update({ expo_push_token: token })
-                .eq("id", data.user.id);
-
-              if (pushTokenError) {
-                log.error("Error enabling notifications:", pushTokenError);
-                showAlert(
-                  "Error",
-                  "An error occurred while updating your notification settings. Please try again.",
-                );
-              }
             }
           }
         }

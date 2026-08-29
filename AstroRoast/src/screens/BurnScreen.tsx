@@ -119,7 +119,7 @@ export const BurnScreen: React.FC<BurnScreenProps> = ({ navigation }) => {
   }
 
   const signColor = data?.sign ? SIGN_COLORS[data.sign] : COLORS.primary;
-  const notificationEnabled = !!profile?.expo_push_token;
+  const notificationEnabled = !!profile?.notificationsEnabled;
 
   const handleShare = async () => {
     try {

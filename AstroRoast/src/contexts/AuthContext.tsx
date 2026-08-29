@@ -2,7 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { initializeIconManager } from "../lib/iconManager";
-import { syncPushToken } from "../lib/notifications";
+import {
+  clearMobilePushSubscription,
+  syncMobilePushSubscription,
+} from "../lib/notifications";
 
 const isWeb =
   typeof window !== "undefined" &&
@@ -38,15 +41,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setSession(session);
         setLoading(false);
         // If a session exists, sync the push token with the backend
-        if (session?.user) {
-          syncPushToken(session.user.id);
-          if (isWeb) {
-            import("../lib/notificationsWeb")
-              .then(({ registerForWebPush }) =>
-                registerForWebPush(session.user.id),
-              )
-              .catch((err) => console.error("registerForWebPush failed:", err));
-          }
+        if (session?.user && !isWeb) {
+          syncMobilePushSubscription(session.user.id);
+        }
+        if (session?.user && isWeb) {
+          import("../lib/notificationsWeb")
+            .then(({ registerForWebPush }) => registerForWebPush(session.user.id))
+            .catch((err) => console.error("registerForWebPush failed:", err));
         }
       })
       .catch(() => {
@@ -68,7 +69,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         session?.user &&
         (_event === "SIGNED_IN" || _event === "TOKEN_REFRESHED")
       ) {
-        syncPushToken(session.user.id);
+        if (!isWeb) {
+          syncMobilePushSubscription(session.user.id);
+        }
         if (isWeb) {
           import("../lib/notificationsWeb")
             .then(({ registerForWebPush }) =>
@@ -87,11 +90,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signOut = async () => {
     // remove push token from the backend on signout to prevent sending notifications to signed-out users
-    if (session?.user) {
-      await supabase
-        .from("profiles")
-        .update({ expo_push_token: null })
-        .eq("id", session.user.id);
+    if (session?.user && !isWeb) {
+      await clearMobilePushSubscription(session.user.id);
     }
     if (isWeb && session?.user) {
       try {

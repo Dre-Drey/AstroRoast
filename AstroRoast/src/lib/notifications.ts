@@ -49,21 +49,59 @@ export async function registerForPushNotificationsAsync() {
   return token;
 }
 
-export const syncPushToken = async (userId: string) => {
+export const syncMobilePushSubscription = async (
+  userId: string,
+): Promise<boolean> => {
   try {
     const token = await registerForPushNotificationsAsync();
-    if (!token) return;
+    if (!token) return false;
 
-    // Met à jour la table profiles (ou ta table dédiée si tu as choisi l'option multi-appareils)
     const { error } = await supabase
-      .from("profiles")
-      .update({ expo_push_token: token })
-      .eq("id", userId);
+      .from("push_subscriptions")
+      .upsert(
+        {
+          user_id: userId,
+          provider: "expo",
+          platform: "mobile",
+          endpoints: null,
+          keys: null,
+          interests: token,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,provider,platform" },
+      );
 
     if (error) {
       log.error("Error syncing push token:", error);
+        return false;
     }
+
+      return true;
   } catch (err) {
     log.error("Error occurred while registering for push notifications:", err);
+      return false;
+  }
+};
+
+  export const clearMobilePushSubscription = async (
+    userId: string,
+  ): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from("push_subscriptions")
+      .delete()
+      .eq("user_id", userId)
+      .eq("provider", "expo")
+      .eq("platform", "mobile");
+
+    if (error) {
+      log.error("Error clearing push token:", error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    log.error("Error occurred while clearing push notifications:", err);
+    return false;
   }
 };

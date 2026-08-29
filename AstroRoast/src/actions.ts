@@ -1,6 +1,7 @@
 import { supabase } from "./lib/supabase";
 import { CosmicEvent, DailyRoast, ProfileSettings } from "./types/database";
 import { log } from "./lib/log";
+import { Platform } from "react-native";
 
 const NETWORK_ERROR_MESSAGE =
   "We could not load this content right now. Check your connection and tap Retry.";
@@ -14,12 +15,24 @@ export const fetchProfile = async (
 ): Promise<ProfileSettings> => {
   const { data, error } = await supabase
     .from("profiles")
-    .select("astro_sign, expo_push_token")
+    .select("astro_sign")
     .eq("id", userId)
     .single();
 
-  if (error) {
-    log.error("Error fetching profile:", error);
+  const provider = Platform.OS === "web" ? "pusher_beams" : "expo";
+  const platform = Platform.OS === "web" ? "web" : "mobile";
+
+  const { data: pushSubscription, error: pushSubscriptionError } =
+    await supabase
+      .from("push_subscriptions")
+      .select("user_id")
+      .eq("user_id", userId)
+      .eq("provider", provider)
+      .eq("platform", platform)
+      .maybeSingle();
+
+  if (error || pushSubscriptionError) {
+    log.error("Error fetching profile:", error ?? pushSubscriptionError);
     throw new Error(NETWORK_ERROR_MESSAGE);
   }
 
@@ -27,7 +40,10 @@ export const fetchProfile = async (
     throw new Error(SIGN_IN_REQUIRED_MESSAGE);
   }
 
-  return data as ProfileSettings;
+  return {
+    astro_sign: data.astro_sign,
+    notificationsEnabled: !!pushSubscription,
+  };
 };
 
 export const fetchDailyRoast = async (

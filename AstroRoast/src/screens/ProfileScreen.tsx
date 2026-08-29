@@ -13,7 +13,10 @@ import { sharedLayout, sharedTypography } from "../styles/common";
 import { supabase } from "../lib/supabase";
 import { ProfileScreenProps } from "../types/navigation";
 import { useAuth } from "../contexts/AuthContext";
-import { registerForPushNotificationsAsync } from "../lib/notifications";
+import {
+  clearMobilePushSubscription,
+  syncMobilePushSubscription,
+} from "../lib/notifications";
 const isWeb =
   typeof window !== "undefined" &&
   typeof navigator !== "undefined" &&
@@ -32,8 +35,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
   const profile = profileQuery.data;
 
   useEffect(() => {
-    setNotificationsEnabled(!!profile?.expo_push_token);
-  }, [profile?.expo_push_token]);
+    setNotificationsEnabled(!!profile?.notificationsEnabled);
+  }, [profile?.notificationsEnabled]);
 
   const handleSignOut = async () => {
     try {
@@ -127,37 +130,26 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = () => {
         }
       } else {
         if (value) {
-          // Register for push notifications and get the token
-          const token = await registerForPushNotificationsAsync();
-          if (!token) {
+          const saved = await syncMobilePushSubscription(session.user.id);
+          if (!saved) {
             showAlert(
               "Error",
-              "Failed to enable notification without your permission. Please allow notifications in your phone settings.",
+              "An error occurred while updating your notification settings. Please try again.",
             );
-            setUpdatingNotifications(false);
+            setNotificationsEnabled(false);
             return;
-          }
-
-          const { error } = await supabase
-            .from("profiles")
-            .update({ expo_push_token: token })
-            .eq("id", session.user.id);
-
-          if (error) {
-            log.error("Error enabling notifications:", error);
-            throw new Error("Failed to enable notifications");
           }
           setNotificationsEnabled(true);
         }
         if (!value) {
-          const { error } = await supabase
-            .from("profiles")
-            .update({ expo_push_token: null })
-            .eq("id", session.user.id);
-
-          if (error) {
-            log.error("Error disabling notifications:", error);
-            throw new Error("Failed to disable notifications");
+          const cleared = await clearMobilePushSubscription(session.user.id);
+          if (!cleared) {
+            showAlert(
+              "Error",
+              "An error occurred while updating your notification settings. Please try again.",
+            );
+            setNotificationsEnabled(true);
+            return;
           }
           setNotificationsEnabled(false);
         }

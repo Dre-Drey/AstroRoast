@@ -21,8 +21,11 @@ export interface Profile {
 
 export type ProfileSettings = {
   astro_sign: AstroSign;
-  expo_push_token: string | null;
+  notificationsEnabled: boolean;
 };
+
+export type PushSubscriptionProvider = "expo" | "pusher_beams";
+export type PushSubscriptionPlatform = "web" | "mobile";
 
 export type DailyRoast = {
   id: string;
