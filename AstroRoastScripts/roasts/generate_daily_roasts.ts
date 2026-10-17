@@ -2,7 +2,13 @@ import { createClient } from "@supabase/supabase-js";
 import { Mistral } from "@mistralai/mistralai";
 import "dotenv/config";
 import { ZODIAC_SIGNS } from "../constants";
-import { SYSTEM_PROMPT, buildUserPrompt, getRandomStyleHint } from "./prompts";
+import { SYSTEM_PROMPT, buildUserPrompt } from "./prompts";
+import {
+  getRandomStyleHint,
+  SignHistory,
+  SignDailySelection,
+  buildDailySelections,
+} from "./style";
 
 const { EXPO_PUBLIC_SUPABASE_URL, SERVICE_ROLE_KEY, MISTRAL_API_KEY } =
   process.env;
@@ -31,12 +37,20 @@ interface RoastEntry {
   advice?: string;
   mainRoast?: string;
   cosmicAdvice?: string;
+  keywords: string[];
+  lifeDomain: string;
+  concreteObject: string;
+  angleUsed: string;
 }
 
 interface NormalizedRoast {
   hook: string;
   content: string;
   advice: string;
+  keywords: string[];
+  lifeDomain: string;
+  concreteObject: string;
+  angleUsed: string;
 }
 
 function sleep(ms: number) {
@@ -45,7 +59,7 @@ function sleep(ms: number) {
 
 function trimRoastContent(
   content: string,
-  maxLength = 400,
+  maxLength = 500,
   minSentenceEnd = 300,
 ): string {
   const trimmed = content.replace(/\s*—\s*/g, ", ").trim();
@@ -64,7 +78,10 @@ function trimRoastContent(
   return trimmed.slice(0, maxLength).trim();
 }
 
-function normalizeRoast(entry: RoastEntry): NormalizedRoast | null {
+function normalizeRoast(
+  entry: RoastEntry,
+  selection: SignDailySelection,
+): NormalizedRoast | null {
   const hook = entry.hook?.trim();
   const content = trimRoastContent(
     entry.main_roast ?? entry.content ?? entry.mainRoast ?? "",
@@ -78,37 +95,61 @@ function normalizeRoast(entry: RoastEntry): NormalizedRoast | null {
 
   if (!hook || !content || !advice) return null;
 
-  return { hook, content, advice };
+  return {
+    hook,
+    content,
+    advice,
+    keywords: entry.keywords ?? [],
+    lifeDomain: selection.lifeDomain,
+    concreteObject: selection.concreteObject,
+    angleUsed: selection.angle,
+  };
 }
 
 function generateFallbackRoast(
   sign: string,
   eventDescription: string,
+  selection: SignDailySelection,
 ): NormalizedRoast {
   const hook = `${sign} in the spotlight`;
   const content = `${sign}: cosmic vibes collide with ${eventDescription}. A cheeky roast for the sign — witty, sharp, harmless.`;
   const advice = "Take a breath, not the spotlight.";
-  return { hook, content, advice };
+  const keywords = ["fallback"];
+  return {
+    hook,
+    content,
+    advice,
+    keywords,
+    lifeDomain: selection.lifeDomain,
+    concreteObject: selection.concreteObject,
+    angleUsed: selection.angle,
+  };
 }
 
 async function generateRoastsForEvent(
   event: CosmicEvent,
   styleHint: string,
-  seed: number,
+  historyBySign: Record<string, SignHistory>,
+  selections: SignDailySelection[],
 ): Promise<Map<string, NormalizedRoast>> {
   const results = new Map<string, NormalizedRoast>();
+  const selectionBySign = new Map(selections.map((s) => [s.sign, s]));
+
   const userPrompt = buildUserPrompt({
     date: event.date,
     eventDescription: event.description,
     styleHint,
-    seed,
+    historyBySign,
+    selections,
   });
   const MAX_RETRIES = 3;
   const RETRYABLE_ERRORS = ["TimeoutError", "429", "500", "503"];
 
   console.log(
-    `Generating roasts for ${event.description} - ${event.date} in style: ${styleHint} (seed: ${seed})`,
+    `Generating roasts for ${event.description} - ${event.date} in style: ${styleHint}`,
   );
+
+  console.log("User prompt sent to model:", userPrompt);
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
@@ -148,7 +189,14 @@ async function generateRoastsForEvent(
             console.warn(`Unknown sign in response: ${entry.sign} — skipped`);
             continue;
           }
-          const normalized = normalizeRoast(entry);
+          const selection = selectionBySign.get(canonicalSign);
+          if (!selection) {
+            console.warn(
+              `No daily selection found for ${canonicalSign} — skipped`,
+            );
+            continue;
+          }
+          const normalized = normalizeRoast(entry, selection);
           if (normalized) {
             results.set(canonicalSign, normalized);
           } else {
@@ -194,7 +242,13 @@ async function generateRoastsForEvent(
   );
   for (const sign of ZODIAC_SIGNS) {
     if (!results.has(sign)) {
-      results.set(sign, generateFallbackRoast(sign, event.description));
+      const selection = selectionBySign.get(sign);
+      if (selection) {
+        results.set(
+          sign,
+          generateFallbackRoast(sign, event.description, selection),
+        );
+      }
     }
   }
 
@@ -212,6 +266,10 @@ async function upsertRoasts(
     content: roast.content,
     advice: roast.advice,
     event_id: event.id,
+    keywords: roast.keywords,
+    life_domain: roast.lifeDomain,
+    concrete_object: roast.concreteObject,
+    angle_used: roast.angleUsed,
   }));
 
   const { error } = await supabase.from("daily_roasts").upsert(rows, {
@@ -227,10 +285,42 @@ async function upsertRoasts(
   }
 }
 
+async function loadHistoryBySign(): Promise<Record<string, SignHistory>> {
+  const { data, error } = await supabase
+    .from("daily_roasts")
+    .select("sign, keywords, life_domain, concrete_object, date")
+    .order("date", { ascending: false })
+    .limit(ZODIAC_SIGNS.length * 5); // marge large, filtrée ensuite par signe
+
+  if (error) {
+    console.error("Error loading history:", error);
+    // on ne bloque pas la génération pour autant : historique vide = pas de contrainte "avoid"
+    return Object.fromEntries(
+      ZODIAC_SIGNS.map((s) => [
+        s,
+        { recentThemes: [], recentDomains: [], recentObjects: [] },
+      ]),
+    );
+  }
+
+  const result: Record<string, SignHistory> = {};
+  for (const sign of ZODIAC_SIGNS) {
+    const last5 = (data ?? []).filter((row) => row.sign === sign).slice(0, 5);
+
+    result[sign] = {
+      recentThemes: last5.flatMap((row) => row.keywords ?? []),
+      recentDomains: last5.map((row) => row.life_domain).filter(Boolean),
+      recentObjects: last5.map((row) => row.concrete_object).filter(Boolean),
+    };
+  }
+
+  return result;
+}
+
 // MAIN FUNCTION
 async function generateWeeklyRoasts(): Promise<void> {
-  const NUMBER_OF_DAYS = 2; // adjust as needed
-  const startDate = new Date('2026-06-23').toISOString().split("T")[0];
+  const NUMBER_OF_DAYS = 4; // adjust as needed
+  const startDate = new Date("2026-10-12").toISOString().split("T")[0];
 
   const { data: events, error } = await supabase
     .from("cosmic_events")
@@ -255,12 +345,18 @@ async function generateWeeklyRoasts(): Promise<void> {
 
   // Generate and upsert roasts for each cosmic event
   for (const event of events as CosmicEvent[]) {
-    // For each event, we generate a unique style hint and seed to ensure variety even if the same event appears in multiple batches.
-    const seed = Math.floor(Math.random() * 99999);
+    // Load history for all signs before generating roasts
+    const historyBySign = await loadHistoryBySign();
+    const selections = buildDailySelections(event.date, historyBySign);
     const styleHint = getRandomStyleHint();
 
     console.log(`\n--- ${event.date} : ${event.description} ---`);
-    const roasts = await generateRoastsForEvent(event, styleHint, seed);
+    const roasts = await generateRoastsForEvent(
+      event,
+      styleHint,
+      historyBySign,
+      selections,
+    );
     console.log(
       `\n--- ${event.date} : Roasts generated, now upserting to database... ---`,
     );
