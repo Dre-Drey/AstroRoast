@@ -60,7 +60,7 @@ export const sharedTypography = StyleSheet.create({
   },
   displayLg: {
     color: COLORS.primary,
-    fontSize: 64,
+    fontSize: 50,
     lineHeight: 64,
     fontWeight: "900",
     letterSpacing: -2,

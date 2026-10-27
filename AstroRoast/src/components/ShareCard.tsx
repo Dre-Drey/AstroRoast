@@ -26,6 +26,14 @@ export default function ShareCard({
   advice,
   viewRef,
 }: ShareCardProps) {
+  const combinedLength = hook.length + roast.length + advice.length;
+  const isDenseContent = combinedLength > 520;
+  const isVeryDenseContent = combinedLength > 760;
+
+  const hookNumberOfLines = isVeryDenseContent ? 2 : isDenseContent ? 3 : 4;
+  const roastNumberOfLines = isVeryDenseContent ? 7 : isDenseContent ? 9 : 11;
+  const adviceNumberOfLines = isVeryDenseContent ? 2 : isDenseContent ? 3 : 4;
+
   return (
     <View
       ref={viewRef}
@@ -40,27 +48,74 @@ export default function ShareCard({
         opacity={0.3}
         style={styles.flameBackground}
       />
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100%",
-          justifyContent: "space-around",
-        }}
-      >
+      <View style={styles.contentContainer}>
         <View style={styles.header}>
           <Text style={styles.appTitle}>DAILY ROAST</Text>
           <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
         </View>
         <View style={styles.mainContent}>
-          <Text style={styles.signTitle}>{sign.toUpperCase()}</Text>
-          <Text style={styles.hookText}>{hook}</Text>
-          <View style={styles.divider} />
-          <Text style={styles.mainRoast}>{renderInlineMarkdown(roast)}</Text>
+          <Text
+            style={styles.signTitle}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+          >
+            {sign.toUpperCase()}
+          </Text>
+          <Text
+            style={[
+              styles.hookText,
+              isDenseContent && styles.hookTextDense,
+              isVeryDenseContent && styles.hookTextVeryDense,
+            ]}
+            numberOfLines={hookNumberOfLines}
+            ellipsizeMode="tail"
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
+            {hook}
+          </Text>
+          <View
+            style={[
+              styles.divider,
+              isDenseContent && styles.dividerDense,
+              isVeryDenseContent && styles.dividerVeryDense,
+            ]}
+          />
+          <Text
+            style={[
+              styles.mainRoast,
+              isDenseContent && styles.mainRoastDense,
+              isVeryDenseContent && styles.mainRoastVeryDense,
+            ]}
+            numberOfLines={roastNumberOfLines}
+            ellipsizeMode="tail"
+            adjustsFontSizeToFit
+            minimumFontScale={0.72}
+          >
+            {renderInlineMarkdown(roast)}
+          </Text>
         </View>
-        <View style={styles.adviceBox}>
+        <View
+          style={[
+            styles.adviceBox,
+            isVeryDenseContent && styles.adviceBoxVeryDense,
+          ]}
+        >
           <Text style={{ color: signColor }}>COSMIC_ADVICE</Text>
-          <Text style={styles.adviceText}>{advice}</Text>
+          <Text
+            style={[
+              styles.adviceText,
+              isDenseContent && styles.adviceTextDense,
+              isVeryDenseContent && styles.adviceTextVeryDense,
+            ]}
+            numberOfLines={adviceNumberOfLines}
+            ellipsizeMode="tail"
+            adjustsFontSizeToFit
+            minimumFontScale={0.82}
+          >
+            {advice}
+          </Text>
         </View>
         <View
           style={{
@@ -107,6 +162,12 @@ const styles = StyleSheet.create({
     top: 10,
     zIndex: 0,
   },
+  contentContainer: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
+    justifyContent: "space-between",
+  },
   header: {
     alignItems: "flex-start",
     zIndex: 1,
@@ -132,9 +193,12 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "flex-start",
     zIndex: 1,
+    marginTop: 8,
+    marginBottom: 8,
+    flexShrink: 1,
   },
   hookText: {
     color: COLORS.void,
@@ -144,12 +208,26 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     lineHeight: 20,
   },
+  hookTextDense: {
+    fontSize: 15,
+    lineHeight: 18,
+  },
+  hookTextVeryDense: {
+    fontSize: 14,
+    lineHeight: 17,
+  },
   divider: {
     width: "40%",
     height: 2,
     backgroundColor: COLORS.void,
     marginVertical: 16,
     borderRadius: 1,
+  },
+  dividerDense: {
+    marginVertical: 12,
+  },
+  dividerVeryDense: {
+    marginVertical: 10,
   },
   mainRoast: {
     color: COLORS.void,
@@ -158,12 +236,23 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontWeight: "500",
   },
+  mainRoastDense: {
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  mainRoastVeryDense: {
+    fontSize: 12,
+    lineHeight: 17,
+  },
   adviceBox: {
     paddingVertical: 10,
     paddingHorizontal: 12,
     backgroundColor: COLORS.void,
     width: "100%",
     zIndex: 1,
+  },
+  adviceBoxVeryDense: {
+    paddingVertical: 8,
   },
   adviceTitle: {
     fontSize: 10,
@@ -178,5 +267,14 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontWeight: "600",
     marginVertical: 8,
+  },
+  adviceTextDense: {
+    fontSize: 13,
+    marginVertical: 6,
+  },
+  adviceTextVeryDense: {
+    fontSize: 12,
+    lineHeight: 16,
+    marginVertical: 4,
   },
 });
