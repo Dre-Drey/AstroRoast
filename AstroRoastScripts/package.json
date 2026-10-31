@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-roasts": "tsx roasts/generate_daily_roasts.ts"
+    "generate-roasts": "tsx roasts/generate_daily_roasts.ts",
+    "generate-prompt-beta": "tsx roasts/prompt_beta/generate.ts"
   },
   "keywords": [],
   "author": "",

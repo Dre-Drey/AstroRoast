@@ -26,18 +26,20 @@ export default function ShareCard({
   advice,
   viewRef,
 }: ShareCardProps) {
-  const combinedLength = hook.length + roast.length + advice.length;
-  const isDenseContent = combinedLength > 520;
-  const isVeryDenseContent = combinedLength > 760;
-
-  const hookNumberOfLines = isVeryDenseContent ? 2 : isDenseContent ? 3 : 4;
-  const roastNumberOfLines = isVeryDenseContent ? 7 : isDenseContent ? 9 : 11;
-  const adviceNumberOfLines = isVeryDenseContent ? 2 : isDenseContent ? 3 : 4;
+  const densityScore =
+    hook.length * 1.1 + roast.length * 1.6 + advice.length * 1.2;
+  const isCompactContent = densityScore > 520;
+  const isUltraCompactContent = densityScore > 760;
 
   return (
     <View
       ref={viewRef}
-      style={[styles.card, { backgroundColor: signColor }]}
+      style={[
+        styles.card,
+        isCompactContent && styles.cardCompact,
+        isUltraCompactContent && styles.cardUltraCompact,
+        { backgroundColor: signColor },
+      ]}
       accessible={false}
       importantForAccessibility="no-hide-descendants"
     >
@@ -48,14 +50,45 @@ export default function ShareCard({
         opacity={0.3}
         style={styles.flameBackground}
       />
-      <View style={styles.contentContainer}>
-        <View style={styles.header}>
-          <Text style={styles.appTitle}>DAILY ROAST</Text>
-          <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
-        </View>
-        <View style={styles.mainContent}>
+      <View
+        style={[
+          styles.contentContainer,
+          isCompactContent && styles.contentContainerCompact,
+        ]}
+      >
+        <View style={[styles.header, isCompactContent && styles.headerCompact]}>
           <Text
-            style={styles.signTitle}
+            style={[
+              styles.appTitle,
+              isCompactContent && styles.appTitleCompact,
+              isUltraCompactContent && styles.appTitleUltraCompact,
+            ]}
+          >
+            DAILY ROAST
+          </Text>
+          <Text
+            style={[
+              styles.dateText,
+              isCompactContent && styles.dateTextCompact,
+              isUltraCompactContent && styles.dateTextUltraCompact,
+            ]}
+          >
+            {date.toLocaleDateString()}
+          </Text>
+        </View>
+        <View
+          style={[
+            styles.mainContent,
+            isCompactContent && styles.mainContentCompact,
+            isUltraCompactContent && styles.mainContentUltraCompact,
+          ]}
+        >
+          <Text
+            style={[
+              styles.signTitle,
+              isCompactContent && styles.signTitleCompact,
+              isUltraCompactContent && styles.signTitleUltraCompact,
+            ]}
             numberOfLines={1}
             adjustsFontSizeToFit
             minimumFontScale={0.7}
@@ -65,33 +98,25 @@ export default function ShareCard({
           <Text
             style={[
               styles.hookText,
-              isDenseContent && styles.hookTextDense,
-              isVeryDenseContent && styles.hookTextVeryDense,
+              isCompactContent && styles.hookTextCompact,
+              isUltraCompactContent && styles.hookTextUltraCompact,
             ]}
-            numberOfLines={hookNumberOfLines}
-            ellipsizeMode="tail"
-            adjustsFontSizeToFit
-            minimumFontScale={0.8}
           >
             {hook}
           </Text>
           <View
             style={[
               styles.divider,
-              isDenseContent && styles.dividerDense,
-              isVeryDenseContent && styles.dividerVeryDense,
+              isCompactContent && styles.dividerCompact,
+              isUltraCompactContent && styles.dividerUltraCompact,
             ]}
           />
           <Text
             style={[
               styles.mainRoast,
-              isDenseContent && styles.mainRoastDense,
-              isVeryDenseContent && styles.mainRoastVeryDense,
+              isCompactContent && styles.mainRoastCompact,
+              isUltraCompactContent && styles.mainRoastUltraCompact,
             ]}
-            numberOfLines={roastNumberOfLines}
-            ellipsizeMode="tail"
-            adjustsFontSizeToFit
-            minimumFontScale={0.72}
           >
             {renderInlineMarkdown(roast)}
           </Text>
@@ -99,40 +124,66 @@ export default function ShareCard({
         <View
           style={[
             styles.adviceBox,
-            isVeryDenseContent && styles.adviceBoxVeryDense,
+            isCompactContent && styles.adviceBoxCompact,
+            isUltraCompactContent && styles.adviceBoxUltraCompact,
           ]}
         >
-          <Text style={{ color: signColor }}>COSMIC_ADVICE</Text>
+          <Text
+            style={[
+              styles.adviceLabel,
+              isCompactContent && styles.adviceLabelCompact,
+              isUltraCompactContent && styles.adviceLabelUltraCompact,
+              { color: signColor },
+            ]}
+          >
+            COSMIC_ADVICE
+          </Text>
           <Text
             style={[
               styles.adviceText,
-              isDenseContent && styles.adviceTextDense,
-              isVeryDenseContent && styles.adviceTextVeryDense,
+              isCompactContent && styles.adviceTextCompact,
+              isUltraCompactContent && styles.adviceTextUltraCompact,
             ]}
-            numberOfLines={adviceNumberOfLines}
-            ellipsizeMode="tail"
-            adjustsFontSizeToFit
-            minimumFontScale={0.82}
           >
             {advice}
           </Text>
         </View>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 12,
-          }}
-        >
-          <Text style={styles.dateText}>Made by </Text>
+        <View style={[styles.footer, isCompactContent && styles.footerCompact]}>
+          <Text
+            style={[
+              styles.dateText,
+              isCompactContent && styles.dateTextCompact,
+              isUltraCompactContent && styles.dateTextUltraCompact,
+            ]}
+          >
+            Made by
+          </Text>
           <Image
             source={require("../../assets/icons/icon.png")}
-            style={{ width: 20, height: 20, marginHorizontal: 2 }}
+            style={[
+              styles.footerIcon,
+              isCompactContent && styles.footerIconCompact,
+              isUltraCompactContent && styles.footerIconUltraCompact,
+            ]}
           />
-          <Text style={{ fontWeight: "600" }}>Astro Roast </Text>
-          <Text style={styles.dateText}>with love</Text>
+          <Text
+            style={[
+              styles.footerBrand,
+              isCompactContent && styles.footerBrandCompact,
+              isUltraCompactContent && styles.footerBrandUltraCompact,
+            ]}
+          >
+            Astro Roast
+          </Text>
+          <Text
+            style={[
+              styles.dateText,
+              isCompactContent && styles.dateTextCompact,
+              isUltraCompactContent && styles.dateTextUltraCompact,
+            ]}
+          >
+            with love
+          </Text>
         </View>
       </View>
     </View>
@@ -156,6 +207,16 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-around",
   },
+  cardCompact: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 14,
+  },
+  cardUltraCompact: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 12,
+  },
   flameBackground: {
     position: "absolute",
     right: -60,
@@ -168,9 +229,15 @@ const styles = StyleSheet.create({
     height: "100%",
     justifyContent: "space-between",
   },
+  contentContainerCompact: {
+    gap: 6,
+  },
   header: {
     alignItems: "flex-start",
     zIndex: 1,
+  },
+  headerCompact: {
+    marginBottom: 4,
   },
   appTitle: {
     color: COLORS.void,
@@ -179,17 +246,39 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     opacity: 0.9,
   },
+  appTitleCompact: {
+    fontSize: 12,
+    letterSpacing: 1.4,
+  },
+  appTitleUltraCompact: {
+    fontSize: 11,
+    letterSpacing: 1.2,
+  },
   signTitle: {
     color: COLORS.void,
     fontSize: 48,
     fontWeight: "400",
     marginVertical: 5,
   },
+  signTitleCompact: {
+    fontSize: 42,
+    marginVertical: 3,
+  },
+  signTitleUltraCompact: {
+    fontSize: 36,
+    marginVertical: 2,
+  },
   dateText: {
     color: COLORS.void,
     fontSize: 12,
     fontWeight: "400",
     opacity: 0.7,
+  },
+  dateTextCompact: {
+    fontSize: 11,
+  },
+  dateTextUltraCompact: {
+    fontSize: 10,
   },
   mainContent: {
     flex: 1,
@@ -200,6 +289,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     flexShrink: 1,
   },
+  mainContentCompact: {
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  mainContentUltraCompact: {
+    marginTop: 2,
+    marginBottom: 2,
+  },
   hookText: {
     color: COLORS.void,
     fontSize: 16,
@@ -208,13 +305,13 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     lineHeight: 20,
   },
-  hookTextDense: {
+  hookTextCompact: {
     fontSize: 15,
     lineHeight: 18,
   },
-  hookTextVeryDense: {
+  hookTextUltraCompact: {
     fontSize: 14,
-    lineHeight: 17,
+    lineHeight: 16,
   },
   divider: {
     width: "40%",
@@ -223,11 +320,11 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     borderRadius: 1,
   },
-  dividerDense: {
+  dividerCompact: {
     marginVertical: 12,
   },
-  dividerVeryDense: {
-    marginVertical: 10,
+  dividerUltraCompact: {
+    marginVertical: 8,
   },
   mainRoast: {
     color: COLORS.void,
@@ -236,13 +333,13 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontWeight: "500",
   },
-  mainRoastDense: {
+  mainRoastCompact: {
     fontSize: 13,
     lineHeight: 19,
   },
-  mainRoastVeryDense: {
+  mainRoastUltraCompact: {
     fontSize: 12,
-    lineHeight: 17,
+    lineHeight: 16,
   },
   adviceBox: {
     paddingVertical: 10,
@@ -251,8 +348,24 @@ const styles = StyleSheet.create({
     width: "100%",
     zIndex: 1,
   },
-  adviceBoxVeryDense: {
+  adviceBoxCompact: {
     paddingVertical: 8,
+    paddingHorizontal: 10,
+  },
+  adviceBoxUltraCompact: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  adviceLabel: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1,
+  },
+  adviceLabelCompact: {
+    fontSize: 9,
+  },
+  adviceLabelUltraCompact: {
+    fontSize: 8,
   },
   adviceTitle: {
     fontSize: 10,
@@ -268,13 +381,47 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginVertical: 8,
   },
-  adviceTextDense: {
+  adviceTextCompact: {
     fontSize: 13,
+    lineHeight: 18,
     marginVertical: 6,
   },
-  adviceTextVeryDense: {
+  adviceTextUltraCompact: {
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: 15,
     marginVertical: 4,
+  },
+  footer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+    gap: 2,
+  },
+  footerCompact: {
+    marginTop: 8,
+  },
+  footerIcon: {
+    width: 20,
+    height: 20,
+    marginHorizontal: 2,
+  },
+  footerIconCompact: {
+    width: 18,
+    height: 18,
+  },
+  footerIconUltraCompact: {
+    width: 16,
+    height: 16,
+  },
+  footerBrand: {
+    fontWeight: "600",
+  },
+  footerBrandCompact: {
+    fontSize: 12,
+  },
+  footerBrandUltraCompact: {
+    fontSize: 11,
   },
 });
