@@ -330,8 +330,8 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   mainContentExtremeCompact: {
-    marginTop: 0,
-    marginBottom: 0,
+    marginTop: 1,
+    marginBottom: 1,
   },
   hookText: {
     color: COLORS.void,
@@ -340,18 +340,22 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontStyle: "italic",
     lineHeight: 20,
+    margin: "auto",
   },
   hookTextCompact: {
     fontSize: 15,
     lineHeight: 18,
+    margin: "auto",
   },
   hookTextUltraCompact: {
     fontSize: 14,
-    lineHeight: 16,
+    lineHeight: 17,
+    margin: "auto",
   },
   hookTextExtremeCompact: {
-    fontSize: 12,
-    lineHeight: 14,
+    fontSize: 13,
+    lineHeight: 16,
+    margin: "auto",
   },
   divider: {
     width: "40%",
@@ -367,7 +371,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   dividerExtremeCompact: {
-    marginVertical: 6,
+    marginVertical: 8,
   },
   mainRoast: {
     color: COLORS.void,
@@ -404,8 +408,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   adviceBoxExtremeCompact: {
-    paddingVertical: 4,
-    paddingHorizontal: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
   },
   adviceLabel: {
     fontSize: 10,
@@ -446,8 +450,8 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   adviceTextExtremeCompact: {
-    fontSize: 10,
-    lineHeight: 12,
+    fontSize: 11,
+    lineHeight: 14,
     marginVertical: 3,
   },
   footer: {
