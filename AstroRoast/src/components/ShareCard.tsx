@@ -340,22 +340,18 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontStyle: "italic",
     lineHeight: 20,
-    margin: "auto",
   },
   hookTextCompact: {
     fontSize: 15,
     lineHeight: 18,
-    margin: "auto",
   },
   hookTextUltraCompact: {
     fontSize: 14,
     lineHeight: 17,
-    margin: "auto",
   },
   hookTextExtremeCompact: {
     fontSize: 13,
     lineHeight: 16,
-    margin: "auto",
   },
   divider: {
     width: "40%",
