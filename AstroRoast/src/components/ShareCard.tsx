@@ -30,6 +30,7 @@ export default function ShareCard({
     hook.length * 1.1 + roast.length * 1.6 + advice.length * 1.2;
   const isCompactContent = densityScore > 520;
   const isUltraCompactContent = densityScore > 760;
+  const isExtremeCompactContent = densityScore > 980;
 
   return (
     <View
@@ -38,6 +39,7 @@ export default function ShareCard({
         styles.card,
         isCompactContent && styles.cardCompact,
         isUltraCompactContent && styles.cardUltraCompact,
+        isExtremeCompactContent && styles.cardExtremeCompact,
         { backgroundColor: signColor },
       ]}
       accessible={false}
@@ -62,6 +64,7 @@ export default function ShareCard({
               styles.appTitle,
               isCompactContent && styles.appTitleCompact,
               isUltraCompactContent && styles.appTitleUltraCompact,
+              isExtremeCompactContent && styles.appTitleExtremeCompact,
             ]}
           >
             DAILY ROAST
@@ -71,6 +74,7 @@ export default function ShareCard({
               styles.dateText,
               isCompactContent && styles.dateTextCompact,
               isUltraCompactContent && styles.dateTextUltraCompact,
+              isExtremeCompactContent && styles.dateTextExtremeCompact,
             ]}
           >
             {date.toLocaleDateString()}
@@ -81,6 +85,7 @@ export default function ShareCard({
             styles.mainContent,
             isCompactContent && styles.mainContentCompact,
             isUltraCompactContent && styles.mainContentUltraCompact,
+            isExtremeCompactContent && styles.mainContentExtremeCompact,
           ]}
         >
           <Text
@@ -88,6 +93,7 @@ export default function ShareCard({
               styles.signTitle,
               isCompactContent && styles.signTitleCompact,
               isUltraCompactContent && styles.signTitleUltraCompact,
+              isExtremeCompactContent && styles.signTitleExtremeCompact,
             ]}
             numberOfLines={1}
             adjustsFontSizeToFit
@@ -100,6 +106,7 @@ export default function ShareCard({
               styles.hookText,
               isCompactContent && styles.hookTextCompact,
               isUltraCompactContent && styles.hookTextUltraCompact,
+              isExtremeCompactContent && styles.hookTextExtremeCompact,
             ]}
           >
             {hook}
@@ -109,6 +116,7 @@ export default function ShareCard({
               styles.divider,
               isCompactContent && styles.dividerCompact,
               isUltraCompactContent && styles.dividerUltraCompact,
+              isExtremeCompactContent && styles.dividerExtremeCompact,
             ]}
           />
           <Text
@@ -116,6 +124,7 @@ export default function ShareCard({
               styles.mainRoast,
               isCompactContent && styles.mainRoastCompact,
               isUltraCompactContent && styles.mainRoastUltraCompact,
+              isExtremeCompactContent && styles.mainRoastExtremeCompact,
             ]}
           >
             {renderInlineMarkdown(roast)}
@@ -126,6 +135,7 @@ export default function ShareCard({
             styles.adviceBox,
             isCompactContent && styles.adviceBoxCompact,
             isUltraCompactContent && styles.adviceBoxUltraCompact,
+            isExtremeCompactContent && styles.adviceBoxExtremeCompact,
           ]}
         >
           <Text
@@ -133,6 +143,7 @@ export default function ShareCard({
               styles.adviceLabel,
               isCompactContent && styles.adviceLabelCompact,
               isUltraCompactContent && styles.adviceLabelUltraCompact,
+              isExtremeCompactContent && styles.adviceLabelExtremeCompact,
               { color: signColor },
             ]}
           >
@@ -143,6 +154,7 @@ export default function ShareCard({
               styles.adviceText,
               isCompactContent && styles.adviceTextCompact,
               isUltraCompactContent && styles.adviceTextUltraCompact,
+              isExtremeCompactContent && styles.adviceTextExtremeCompact,
             ]}
           >
             {advice}
@@ -154,6 +166,7 @@ export default function ShareCard({
               styles.dateText,
               isCompactContent && styles.dateTextCompact,
               isUltraCompactContent && styles.dateTextUltraCompact,
+              isExtremeCompactContent && styles.dateTextExtremeCompact,
             ]}
           >
             Made by
@@ -164,6 +177,7 @@ export default function ShareCard({
               styles.footerIcon,
               isCompactContent && styles.footerIconCompact,
               isUltraCompactContent && styles.footerIconUltraCompact,
+              isExtremeCompactContent && styles.footerIconExtremeCompact,
             ]}
           />
           <Text
@@ -171,6 +185,7 @@ export default function ShareCard({
               styles.footerBrand,
               isCompactContent && styles.footerBrandCompact,
               isUltraCompactContent && styles.footerBrandUltraCompact,
+              isExtremeCompactContent && styles.footerBrandExtremeCompact,
             ]}
           >
             Astro Roast
@@ -180,6 +195,7 @@ export default function ShareCard({
               styles.dateText,
               isCompactContent && styles.dateTextCompact,
               isUltraCompactContent && styles.dateTextUltraCompact,
+              isExtremeCompactContent && styles.dateTextExtremeCompact,
             ]}
           >
             with love
@@ -216,6 +232,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 12,
+  },
+  cardExtremeCompact: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 10,
   },
   flameBackground: {
     position: "absolute",
@@ -254,6 +275,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.2,
   },
+  appTitleExtremeCompact: {
+    fontSize: 10,
+    letterSpacing: 1,
+  },
   signTitle: {
     color: COLORS.void,
     fontSize: 48,
@@ -268,6 +293,10 @@ const styles = StyleSheet.create({
     fontSize: 36,
     marginVertical: 2,
   },
+  signTitleExtremeCompact: {
+    fontSize: 30,
+    marginVertical: 1,
+  },
   dateText: {
     color: COLORS.void,
     fontSize: 12,
@@ -279,6 +308,9 @@ const styles = StyleSheet.create({
   },
   dateTextUltraCompact: {
     fontSize: 10,
+  },
+  dateTextExtremeCompact: {
+    fontSize: 9,
   },
   mainContent: {
     flex: 1,
@@ -297,6 +329,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: 2,
   },
+  mainContentExtremeCompact: {
+    marginTop: 0,
+    marginBottom: 0,
+  },
   hookText: {
     color: COLORS.void,
     fontSize: 16,
@@ -313,6 +349,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 16,
   },
+  hookTextExtremeCompact: {
+    fontSize: 12,
+    lineHeight: 14,
+  },
   divider: {
     width: "40%",
     height: 2,
@@ -325,6 +365,9 @@ const styles = StyleSheet.create({
   },
   dividerUltraCompact: {
     marginVertical: 8,
+  },
+  dividerExtremeCompact: {
+    marginVertical: 6,
   },
   mainRoast: {
     color: COLORS.void,
@@ -341,6 +384,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
   },
+  mainRoastExtremeCompact: {
+    fontSize: 11,
+    lineHeight: 13,
+  },
   adviceBox: {
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -356,6 +403,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 8,
   },
+  adviceBoxExtremeCompact: {
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+  },
   adviceLabel: {
     fontSize: 10,
     fontWeight: "800",
@@ -366,6 +417,9 @@ const styles = StyleSheet.create({
   },
   adviceLabelUltraCompact: {
     fontSize: 8,
+  },
+  adviceLabelExtremeCompact: {
+    fontSize: 7,
   },
   adviceTitle: {
     fontSize: 10,
@@ -391,6 +445,11 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     marginVertical: 4,
   },
+  adviceTextExtremeCompact: {
+    fontSize: 10,
+    lineHeight: 12,
+    marginVertical: 3,
+  },
   footer: {
     display: "flex",
     flexDirection: "row",
@@ -415,6 +474,10 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
   },
+  footerIconExtremeCompact: {
+    width: 14,
+    height: 14,
+  },
   footerBrand: {
     fontWeight: "600",
   },
@@ -423,5 +486,8 @@ const styles = StyleSheet.create({
   },
   footerBrandUltraCompact: {
     fontSize: 11,
+  },
+  footerBrandExtremeCompact: {
+    fontSize: 10,
   },
 });
